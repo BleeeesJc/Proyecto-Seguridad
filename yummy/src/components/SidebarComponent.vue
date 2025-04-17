@@ -3,6 +3,8 @@
     <div class="sidebar">
         <h2 class="logo">Yummy</h2>
         <div class="opciones">
+            <a><router-link to="/panelAdministrativo/rol" active-class="active-link"
+                class="sidebar-link">Rol</router-link></a>
             <a><router-link to="/panelAdministrativo/section1" active-class="active-link"
                     class="sidebar-link">Dashboard</router-link></a>
             <a><router-link to="/panelAdministrativo/ofertas" active-class="active-link"

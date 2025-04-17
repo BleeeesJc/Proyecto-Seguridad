@@ -24,6 +24,7 @@ import PlatillosAdminComponent from '@/components/PlatillosAdminComponent.vue';
 import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
 import UsuariosAdminComponent from '../ventanas/UsuariosAdminComponent.vue';
 import DashboardComponent from '../ventanas/dashboardComponent.vue';
+import RolComponent from '@/ventanas/RolComponent.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -120,6 +121,11 @@ const router = createRouter({
       component: PanelAdministrativo,
       //meta: { requiresAuth: true }, // Requiere autenticación
       children: [
+        {
+          path: 'rol',
+          name: 'Rol',
+          component: RolComponent,
+        },
         {
           path: 'section1',
           name: 'Dashboard',
