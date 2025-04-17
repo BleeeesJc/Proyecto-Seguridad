@@ -92,8 +92,18 @@ CREATE TABLE reserva (
 
 -- Table: rol
 CREATE TABLE rol (
-    idrol SERIAL PRIMARY KEY,
-    rol varchar(25)
+    idRol int  SERIAL PRIMARY KEY,
+    nombre varchar(25)  NOT NULL,
+    pagos boolean  NOT NULL,
+    reservas boolean  NOT NULL,
+    menu boolean  NOT NULL,
+    ofertas boolean  NOT NULL,
+    usuarios boolean  NOT NULL,
+    platillos boolean  NOT NULL,
+    mesas boolean  NOT NULL,
+    paneladmin boolean  NOT NULL,
+    roles boolean  NOT NULL,
+    reportes boolean  NOT NULL
 );
 
 -- Table: usuario

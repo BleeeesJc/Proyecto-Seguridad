@@ -26,21 +26,28 @@ exports.getRolById = async (req, res) => {
 };
 
 exports.createRol = async (req, res) => {
-  const { nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
   try {
-    const newRol = await Rol.create({ nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes });
-    res.status(201).json(newRol);
+    const {
+      rol, pagos, reservas, menu, ofertas,
+      usuarios, platillos, mesas, paneladmin, roles, reportes
+    } = req.body;
+
+    const newRol = await Rol.create({
+      rol, pagos, reservas, menu, ofertas,
+      usuarios, platillos, mesas, paneladmin, roles, reportes
+    });
+    return res.status(201).json(newRol);
   } catch (error) {
-    console.error('Error creating rol:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+
 exports.updateRol = async (req, res) => {
   const { id } = req.params;
-  const { nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
+  const { rol, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
   try {
-    const [updated] = await Rol.update({ nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes }, {
+    const [updated] = await Rol.update({ rol, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes }, {
       where: { idrol: id }
     });
     if (!updated) {
