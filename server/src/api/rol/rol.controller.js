@@ -1,85 +1,70 @@
 // src/api/rol.controller.js
-const sequelize = require('../../config/db');
+const Rol = require('../rol/rol.model');
 
-// Crear un nuevo rol
-exports.crearRol = async (req, res) => {
-  const { rol } = req.body;
-
+exports.getAllRoles = async (req, res) => {
   try {
-    await sequelize.query(
-      `INSERT INTO rol (rol) VALUES (:rol)`,
-      {
-        replacements: { rol },
-        type: sequelize.QueryTypes.INSERT,
-      }
-    );
-    res.status(201).json({ message: 'Rol creado exitosamente' });
+    const roles = await Rol.findAll();
+    res.status(200).json(roles);
   } catch (error) {
-    console.error("Error al crear el rol:", error);
-    res.status(500).json({ error: 'Error al crear el rol', details: error.message });
+    console.error('Error fetching roles:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-// Obtener todos los roles
-exports.obtenerRoles = async (req, res) => {
-  try {
-    const roles = await sequelize.query(
-      `SELECT * FROM rol`,
-      { type: sequelize.QueryTypes.SELECT }
-    );
-    res.json(roles);
-  } catch (error) {
-    console.error("Error al obtener los roles:", error);
-    res.status(500).json({ error: 'Error al obtener los roles' });
-  }
-};
-
-// Actualizar un rol
-exports.actualizarRol = async (req, res) => {
+exports.getRolById = async (req, res) => {
   const { id } = req.params;
-  const { rol } = req.body;
-
   try {
-    const [actualizado] = await sequelize.query(
-      `UPDATE rol SET rol = :rol WHERE idRol = :id`,
-      {
-        replacements: { id, rol },
-        type: sequelize.QueryTypes.UPDATE,
-      }
-    );
-
-    if (actualizado) {
-      res.json({ message: 'Rol actualizado exitosamente' });
-    } else {
-      res.status(404).json({ error: 'Rol no encontrado' });
+    const rol = await Rol.findByPk(id);
+    if (!rol) {
+      return res.status(404).json({ message: 'Rol not found' });
     }
+    res.status(200).json(rol);
   } catch (error) {
-    console.error("Error al actualizar el rol:", error);
-    res.status(500).json({ error: 'Error al actualizar el rol' });
+    console.error('Error fetching rol:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-// Eliminar un rol
-exports.eliminarRol = async (req, res) => {
+exports.createRol = async (req, res) => {
+  const { nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
+  try {
+    const newRol = await Rol.create({ nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes });
+    res.status(201).json(newRol);
+  } catch (error) {
+    console.error('Error creating rol:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.updateRol = async (req, res) => {
   const { id } = req.params;
-
+  const { nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
   try {
-    const eliminado = await sequelize.query(
-      `DELETE FROM rol WHERE idRol = :id`,
-      {
-        replacements: { id },
-        type: sequelize.QueryTypes.DELETE,
-      }
-    );
-
-    if (eliminado) {
-      res.status(204).json();
-    } else {
-      res.status(404).json({ error: 'Rol no encontrado' });
+    const [updated] = await Rol.update({ nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes }, {
+      where: { idrol: id }
+    });
+    if (!updated) {
+      return res.status(404).json({ message: 'Rol not found' });
     }
+    res.status(200).json({ message: 'Rol updated successfully' });
   } catch (error) {
-    console.error("Error al eliminar el rol:", error);
-    res.status(500).json({ error: 'Error al eliminar el rol' });
+    console.error('Error updating rol:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+exports.deleteRol = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deleted = await Rol.destroy({
+      where: { idrol: id }
+    });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Rol not found' });
+    }
+    res.status(200).json({ message: 'Rol deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting rol:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

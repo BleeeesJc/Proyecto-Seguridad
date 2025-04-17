@@ -9,4 +9,6 @@ const sequelize = new Sequelize(config.dbName, config.dbUser, config.dbPassword,
   logging: false,
 });
 
+console.log("Base de datos conectada en el puerto: " + config.dbPort);
+
 module.exports = sequelize;

@@ -1,12 +1,13 @@
 // src/api/rol.routes.js
 const express = require('express');
 const router = express.Router();
-const rolController = require('./rol.controller');
+const rolController = require('../rol/rol.controller');
 
 // Define las rutas
-router.post('/', rolController.crearRol);
-router.get('/', rolController.obtenerRoles);
-router.put('/:id', rolController.actualizarRol);
-router.delete('/:id', rolController.eliminarRol);
+router.post('/', rolController.createRol);
+router.get('/', rolController.getAllRoles);
+router.get('/:id', rolController.getRolById);
+router.put('/:id', rolController.updateRol);
+router.delete('/:id', rolController.deleteRol);
 
 module.exports = router;
