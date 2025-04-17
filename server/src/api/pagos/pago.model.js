@@ -31,6 +31,9 @@ const Pago = sequelize.define('Pago', {
       key: 'idusuario',
     },
   },
+}, {
+  timestamps: false,
+  tableName: 'pago',
 });
 
 module.exports = Pago;

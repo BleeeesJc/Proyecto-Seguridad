@@ -43,6 +43,9 @@ const Oferta = sequelize.define('Oferta', {
       key: 'idPlato',
     },
   },
+}, {
+  tableName: 'oferta',
+  timestamps: false,
 });
 
 module.exports = Oferta;

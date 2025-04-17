@@ -18,7 +18,7 @@ const Calificacion = sequelize.define('Resenia', {
   fecha: {
     type: DataTypes.DATEONLY,
     allowNull: false,
-    defaultValue: DataTypes.NOW, 
+    defaultValue: DataTypes.NOW,
   },
   idusuario: {
     type: DataTypes.INTEGER,
@@ -36,6 +36,9 @@ const Calificacion = sequelize.define('Resenia', {
       key: 'idplato',
     },
   },
+}, {
+  timestamps: false,
+  tableName: 'resenia',
 });
 
 module.exports = Calificacion;

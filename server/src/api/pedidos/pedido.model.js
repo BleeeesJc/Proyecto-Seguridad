@@ -32,6 +32,9 @@ const Pedido = sequelize.define('Pedido', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+}, {
+  timestamps: false,
+  tableName: 'pedido',
 });
 
 module.exports = Pedido;

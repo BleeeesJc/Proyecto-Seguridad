@@ -36,6 +36,9 @@ const DetallePedido = sequelize.define('DetallePedido', {
       key: 'idreserva',
     },
   },
+}, {
+  timestamps: false,
+  tableName: 'detalle_pedido',
 });
 
 module.exports = DetallePedido;

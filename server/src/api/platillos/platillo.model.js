@@ -24,19 +24,22 @@ const Platillo = sequelize.define('Platillo', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'categoria', // Asegúrate de que esta referencia existe en tu base de datos
+      model: 'categoria',
       key: 'idCategoria',
     },
   },
   imagen: {
-    type: DataTypes.STRING(255), // Longitud para URLs
-    allowNull: true, // Opcional si no es obligatorio
+    type: DataTypes.STRING(255),
+    allowNull: true,
   },
   estado: {
-    type: DataTypes.INTEGER, // Tipo entero para representar los estados
-    defaultValue: 1, // Si lo deseas, puedes asignar un valor por defecto
-    allowNull: false, // Si prefieres que siempre tenga un valor
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    allowNull: false,
   },
+}, {
+  timestamps: false,
+  tableName: 'platillo',
 });
 
 module.exports = Platillo;

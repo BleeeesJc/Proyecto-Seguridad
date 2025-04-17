@@ -36,6 +36,9 @@ const Reserva = sequelize.define('Reserva', {
       key: 'idMesa',
     },
   },
+}, {
+  timestamps: false,
+  tableName: 'reserva',
 });
 
 module.exports = Reserva;
