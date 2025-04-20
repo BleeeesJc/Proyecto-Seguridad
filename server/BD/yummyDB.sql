@@ -92,7 +92,7 @@ CREATE TABLE reserva (
 
 -- Table: rol
 CREATE TABLE rol (
-    idRol int  SERIAL PRIMARY KEY,
+    idRol  SERIAL PRIMARY KEY,
     nombre varchar(25)  NOT NULL,
     pagos boolean  NOT NULL,
     reservas boolean  NOT NULL,
@@ -104,6 +104,14 @@ CREATE TABLE rol (
     paneladmin boolean  NOT NULL,
     roles boolean  NOT NULL,
     reportes boolean  NOT NULL
+);
+
+CREATE TABLE historico_contrasenas (
+    id SERIAL PRIMARY KEY,
+    idusuario INT NOT NULL,
+    password TEXT NOT NULL,
+    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
 );
 
 -- Table: usuario
