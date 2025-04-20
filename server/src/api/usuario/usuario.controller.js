@@ -9,15 +9,14 @@ exports.registrarUsuario = async (req, res) => {
   try {
     console.log('Datos recibidos para registro:', { nombre, apellidos, email });
 
-    // Paso 1: Buscar el rol de "usuario"
+    // Paso 1: Buscar el rol de "usuario" (CORREGIDO: campo 'nombre' en vez de 'rol')
     const [rol] = await sequelize.query(
-      `SELECT idrol FROM rol WHERE rol = 'usuario'`,
+      `SELECT idrol FROM rol WHERE nombre = 'usuario'`,
       { type: sequelize.QueryTypes.SELECT }
     );
 
     console.log('Rol encontrado:', rol);
 
-    // Verificar si el rol fue encontrado
     if (!rol || !rol.idrol) {
       return res.status(500).json({ message: 'El rol de usuario no existe en la base de datos' });
     }
@@ -26,17 +25,18 @@ exports.registrarUsuario = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log('Contraseña encriptada:', hashedPassword);
 
-    // Paso 3: Insertar el nuevo usuario con el rol de "usuario"
+    // Paso 3: Insertar el nuevo usuario con idrol y activo en true
     await sequelize.query(
-      `INSERT INTO usuario (nombre, apellidos, correo, password, idrol)
-       VALUES (:nombre, :apellidos, :email, :password, :idrol)`,
+      `INSERT INTO usuario (nombre, apellidos, correo, password, idrol, activo)
+       VALUES (:nombre, :apellidos, :email, :password, :idrol, :activo)`,
       {
         replacements: {
           nombre,
           apellidos,
           email,
-          password: hashedPassword, // Contraseña encriptada
-          idrol: rol.idrol, // ID del rol de "usuario"
+          password: hashedPassword,
+          idrol: rol.idrol,
+          activo: true, // Asignar activo en true
         },
         type: sequelize.QueryTypes.INSERT,
       }
@@ -49,6 +49,7 @@ exports.registrarUsuario = async (req, res) => {
     res.status(500).json({ message: 'Error al registrar el usuario', error: error.message });
   }
 };
+
 
 // Actualizar solo el rol de un usuario
 exports.actualizarRolUsuario = async (req, res) => {
@@ -187,36 +188,76 @@ exports.obtenerUsuarioPorCorreo = async (req, res) => {
 };
 
 // Actualizar solo la contraseña
+// server/src/api/usuario/usuario.controller.js
+const HistoricoContrasena = require('../historico_contrasenas/historico_contrasenas.model');
+const { Op } = require('sequelize');
+
 exports.actualizarContrasena = async (req, res) => {
-  const { id } = req.params; // Obtiene el id del usuario desde los parámetros de la URL
-  const { newPassword } = req.body; // Obtiene la nueva contraseña desde el cuerpo de la solicitud
+  const { id } = req.params; // ID del usuario
+  const { newPassword } = req.body; // Nueva contraseña en texto plano
 
   console.log("ID recibido:", id);
-
   console.log("Nueva contraseña:", newPassword);
+
   try {
-    // Asegúrate de hashear la nueva contraseña antes de almacenarla
+    // Paso 1: Obtener la contraseña actual del usuario
+    const [usuario] = await sequelize.query(
+      `SELECT password FROM usuario WHERE idusuario = :id`,
+      {
+        replacements: { id },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Paso 2: Verificar si la nueva contraseña es igual a la actual
+    const esMismaActual = await bcrypt.compare(newPassword, usuario.password);
+    if (esMismaActual) {
+      return res.status(400).json({ error: 'No puedes usar tu contraseña actual.' });
+    }
+
+    // Paso 3: Verificar si la nueva contraseña fue usada antes
+    const historico = await HistoricoContrasena.findAll({
+      where: { idusuario: id }
+    });
+
+    for (const entry of historico) {
+      const match = await bcrypt.compare(newPassword, entry.password);
+      if (match) {
+        return res.status(400).json({ error: 'No puedes reutilizar una contraseña anterior.' });
+      }
+    }
+
+    // Paso 4: Guardar la contraseña actual en el histórico antes de actualizar
+    await HistoricoContrasena.create({
+      idusuario: id,
+      password: usuario.password, // Guardamos la contraseña actual (ya está hasheada)
+    });
+
+    // Paso 5: Hashear la nueva contraseña
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Ejecuta la consulta para actualizar solo el campo de la contraseña
-    const [actualizado] = await sequelize.query(
-      `UPDATE usuario SET password = :password WHERE idUsuario = :id`,
+    // Paso 6: Actualizar la nueva contraseña en la tabla usuario
+    await sequelize.query(
+      `UPDATE usuario SET password = :password WHERE idusuario = :id`,
       {
         replacements: { id, password: hashedPassword },
         type: sequelize.QueryTypes.UPDATE,
       }
     );
 
-    if (actualizado) {
-      res.json({ message: 'Contraseña actualizada exitosamente' });
-    } else {
-      res.status(404).json({ error: 'Usuario no encontrado' });
-    }
+    console.log('Contraseña actualizada exitosamente');
+    res.json({ message: 'Contraseña actualizada exitosamente' });
+
   } catch (error) {
     console.error("Error al actualizar la contraseña:", error);
     res.status(500).json({ error: 'Error al actualizar la contraseña' });
   }
 };
+
 
 
 // Eliminar un usuario

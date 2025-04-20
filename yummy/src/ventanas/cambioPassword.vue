@@ -62,43 +62,48 @@ export default {
       this.showPassword = !this.showPassword;
     },
     async changePassword() {
-        // Modificamos la expresión regular para que requiera mayúsculas, caracteres especiales y números
-        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
 
-        if (!passwordRegex.test(this.password)) {
-            // Mostrar un SweetAlert si la contraseña no cumple los requisitos
-            Swal.fire({
-            icon: 'error',
-            title: 'Contraseña inválida',
-            text: 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial.',
-            });
-            return;
-        }
+  if (!passwordRegex.test(this.password)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Contraseña inválida',
+      text: 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial.',
+    });
+    return;
+  }
 
-        try {
-            const userId = this.$route.params.id; // Obtener el ID del usuario desde los parámetros de la URL
-            const response = await axios.put(`/api/usuario/actualizar-contrasena/${userId}`, {
-            newPassword: this.password,
-            });
+  try {
+    const userId = this.$route.params.id; // ID del usuario desde la URL
+    const response = await axios.put(`/api/usuario/actualizar-contrasena/${userId}`, {
+      newPassword: this.password,
+    });
 
-            if (response.data.message) {
-            // Contraseña actualizada correctamente
-            Swal.fire({
-                icon: 'success',
-                title: '¡Contraseña actualizada!',
-                text: 'Tu contraseña ha sido cambiada con éxito.',
-            });
-            this.$router.push('/iniciarsesion'); // Redirige al login si la contraseña se actualiza correctamente
-            }
-        } catch (error) {
-            console.error('Error al actualizar la contraseña:', error);
-            Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Hubo un error al actualizar la contraseña.',
-            });
-        }
-        },
+    if (response.data.message) {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Contraseña actualizada!',
+        text: 'Tu contraseña ha sido cambiada con éxito.',
+      });
+      this.$router.push('/iniciarsesion'); // Redirige al login
+    }
+  } catch (error) {
+    console.error('Error al actualizar la contraseña:', error);
+
+    let mensajeError = 'Hubo un error al actualizar la contraseña.';
+
+    if (error.response && error.response.data && error.response.data.error) {
+      mensajeError = error.response.data.error;
+    }
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: mensajeError,
+    });
+  }
+}
+,
 
   },
 };
