@@ -1,4 +1,4 @@
-// src/api/rol.model.js
+// server/src/api/rol/rol.model.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/db');
 
@@ -6,55 +6,55 @@ const Rol = sequelize.define('Rol', {
   idrol: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    autoIncrement: true
   },
-  rol: {
+  nombre: {  // <-- CAMBIADO: era "rol", debe ser "nombre"
     type: DataTypes.STRING(25),
-    allowNull: false,
+    allowNull: false
   },
   pagos: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   reservas: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   menu: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   ofertas: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   usuarios: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   platillos: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   mesas: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   paneladmin: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   roles: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: false
   },
   reportes: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
-  },
+    allowNull: false
+  }
 }, {
-  timestamps: false,
-  tableName: 'rol'
+  tableName: 'rol', // nombre exacto de la tabla en la base de datos
+  timestamps: false
 });
 
 module.exports = Rol;

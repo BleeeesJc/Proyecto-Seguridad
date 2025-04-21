@@ -7,7 +7,7 @@
           <i class="fas fa-user-tag"></i> Nombre del rol
         </label>
         <input
-          v-model="nuevoRol.rol"
+          v-model="nuevoRol.nombre"
           id="rol"
           type="text"
           placeholder="Nombre del rol"
@@ -44,7 +44,7 @@ export default {
   data() {
     return {
       nuevoRol: {
-        rol: "",
+        nombre: "",
         pagos: false,
         reservas: false,
         menu: false,
@@ -74,13 +74,13 @@ export default {
   },
   methods: {
     async crearRol() {
-      const nombreRaw = this.nuevoRol.rol;
+      const nombreRaw = this.nuevoRol.nombre;
       const nombre = typeof nombreRaw === "string" ? nombreRaw.trim() : "";
       if (!nombre) {
         alert("El nombre del rol es obligatorio.");
         return;
       }
-      this.nuevoRol.rol = nombre;
+      this.nuevoRol.nombre = nombre;
 
       try {
         const response = await axios.post(
@@ -91,10 +91,10 @@ export default {
         this.mostrarSuccessModal("Rol creado correctamente");
         this.resetForm();
       } catch (error) {
-        console.error("Error al crear rol:", error.response?.data || error);
-        this.mostrarSuccessModal("Error al crear el rol");
+        console.error('Error al crear rol:', error.response ? error.response.data : error);
       }
     },
+
     resetForm() {
       Object.keys(this.nuevoRol).forEach((key) => {
         this.nuevoRol[key] =

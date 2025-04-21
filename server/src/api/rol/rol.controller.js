@@ -28,26 +28,28 @@ exports.getRolById = async (req, res) => {
 exports.createRol = async (req, res) => {
   try {
     const {
-      rol, pagos, reservas, menu, ofertas,
+      nombre, pagos, reservas, menu, ofertas,
       usuarios, platillos, mesas, paneladmin, roles, reportes
     } = req.body;
 
     const newRol = await Rol.create({
-      rol, pagos, reservas, menu, ofertas,
+      nombre, pagos, reservas, menu, ofertas,
       usuarios, platillos, mesas, paneladmin, roles, reportes
     });
     return res.status(201).json(newRol);
   } catch (error) {
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error('Error creando rol:', error);  // Mejora para ver el error real
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
 
 
+
 exports.updateRol = async (req, res) => {
   const { id } = req.params;
-  const { rol, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
+  const { nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
   try {
-    const [updated] = await Rol.update({ rol, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes }, {
+    const [updated] = await Rol.update({ nombre, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes }, {
       where: { idrol: id }
     });
     if (!updated) {
@@ -56,9 +58,10 @@ exports.updateRol = async (req, res) => {
     res.status(200).json({ message: 'Rol updated successfully' });
   } catch (error) {
     console.error('Error updating rol:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
+
 
 exports.deleteRol = async (req, res) => {
   const { id } = req.params;
