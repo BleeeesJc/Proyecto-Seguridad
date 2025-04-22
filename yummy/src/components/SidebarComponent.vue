@@ -1,45 +1,61 @@
 /* eslint-disable */
 <template>
     <div class="sidebar">
-        <h2 class="logo">Yummy</h2>
-        <div class="opciones">
-            <a><router-link to="/panelAdministrativo/rol" active-class="active-link"
-                class="sidebar-link">Rol</router-link></a>
-            <a><router-link to="/panelAdministrativo/section1" active-class="active-link"
-                    class="sidebar-link">Dashboard</router-link></a>
-            <a><router-link to="/panelAdministrativo/ofertas" active-class="active-link"
-                    class="sidebar-link">Ofertas</router-link></a>
-            <a><router-link to="/panelAdministrativo/usuarios" active-class="active-link"
-                    class="sidebar-link">Usuarios</router-link></a>
-            <a><router-link to="/panelAdministrativo/platillos" active-class="active-link"
-                    class="sidebar-link">Platillos</router-link></a>
-            <a><router-link to="/panelAdministrativo/pedidosadmin" active-class="active-link"
-                    class="sidebar-link">Pedidos</router-link></a>
-            <a><router-link to="/panelAdministrativo/reservas" active-class="active-link"
-                    class="sidebar-link">Reservas</router-link></a>
-            <a><router-link to="/panelAdministrativo/mapa" active-class="active-link" class="sidebar-link">Mapa
-                    Interactivo</router-link></a>
-        </div>
+      <h2 class="logo">Yummy</h2>
+      <div class="opciones">
+        <a
+          v-for="(ruta, index) in rutasConPermiso"
+          :key="index"
+        >
+          <router-link
+            :to="ruta.to"
+            class="sidebar-link"
+            active-class="active-link"
+          >
+            {{ ruta.label }}
+          </router-link>
+        </a>
+      </div>
     </div>
-</template>
-
-
+  </template>
+  
 <script>
 export default {
-    name: "SidebarComponent",
-    data() {
-        return {
-            selectedSection: 'DashboardComponent', // Define una sección predeterminada
-        };
-    },
-    methods: {
-        navigate(section) {
-            this.selectedSection = section;
-            this.$emit('navigate', section);
-        },
-    },
+  name: "SidebarComponent",
+  data() {
+    return {
+      selectedSection: 'DashboardComponent',
+      permisos: {},
+      rutasVisibles: [
+        { to: "/panelAdministrativo/rol", label: "Rol", permiso: "roles" },
+        { to: "/panelAdministrativo/section1", label: "Dashboard", permiso: "paneladmin" },
+        { to: "/panelAdministrativo/ofertas", label: "Ofertas", permiso: "ofertas" },
+        { to: "/panelAdministrativo/usuarios", label: "Usuarios", permiso: "usuarios" },
+        { to: "/panelAdministrativo/platillos", label: "Platillos", permiso: "platillos" },
+        { to: "/panelAdministrativo/pedidosadmin", label: "Pedidos", permiso: "pagos" },
+        { to: "/panelAdministrativo/reservas", label: "Reservas", permiso: "reservas" },
+        { to: "/panelAdministrativo/mapa", label: "Mapa Interactivo", permiso: "mesas" }
+      ]
+    };
+  },
+  computed: {
+    rutasConPermiso() {
+      return this.rutasVisibles.filter(ruta => this.permisos[ruta.permiso]);
+    }
+  },
+  created() {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    this.permisos = usuario?.rol || {};
+  },
+  methods: {
+    navigate(section) {
+      this.selectedSection = section;
+      this.$emit('navigate', section);
+    }
+  }
 };
 </script>
+
 
 <style scoped>
 .sidebar {

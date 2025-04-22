@@ -4,23 +4,34 @@
       <!-- Logo -->
       <img src="@/assets/images/logoprincipal.jpeg" alt="Imagen del logo" class="logo" style="width: 120px;" @click="goToHome">
       <h1>Tu lugar para compartir y disfrutar</h1>
-      
+
       <div class="opciones">
+        <!-- Ofertas -->
         <a><router-link to="/ofertas">Ofertas</router-link></a>
-        
-        <a v-if="(isLoggedIn && isAdmin === 2) || (isLoggedIn && isAdmin === 3) ">
+
+        <!-- Realizar Pedido -->
+        <a v-if="isLoggedIn && (isAdmin === 2 || isAdmin === 3)">
           <router-link to="/menumesero">Realizar Pedido</router-link>
         </a>
-        <a v-else><router-link to="/menupedido">Realizar Pedido</router-link></a>
+        <a v-else>
+          <router-link to="/menupedido">Realizar Pedido</router-link>
+        </a>
 
-        <a v-if="isLoggedIn && isAdmin != 2"><router-link to="/mapa">Mapa Interactivo</router-link></a>
+        <!-- Mapa Interactivo -->
+        <a v-if="isLoggedIn && isAdmin !== 2">
+          <router-link to="/mapa">Mapa Interactivo</router-link>
+        </a>
+
+        <!-- Menú siempre visible -->
         <a><router-link to="/menu">Menu</router-link></a>
-        <a v-if="isLoggedIn && isAdmin === 2">
+
+        <!-- Panel Administrativo (todos excepto rol 1) -->
+        <a v-if="isLoggedIn && isAdmin !== 1">
           <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
         </a>
 
-        <!-- Botón Opciones -->
-        <div v-if="isLoggedIn && isAdmin !== 2" class="dropdown" @mouseleave="closeDropdown">
+        <!-- Dropdown de opciones (todos excepto rol 1) -->
+        <div v-if="isLoggedIn && isAdmin !== 1" class="dropdown" @mouseleave="closeDropdown">
           <button class="dropdown-btn" @click="toggleDropdown">Opciones</button>
           <div v-if="dropdownVisible" class="dropdown-content">
             <router-link to="/mispedidos">Mis Pedidos</router-link>
@@ -30,11 +41,10 @@
           </div>
         </div>
 
+        <!-- Cerrar sesión directo (si no es rol 1) -->
+        <span v-if="isLoggedIn && isAdmin !== 1" @click="handleAuthAction" class="logout-admin">Cerrar Sesión</span>
 
-        <!-- Solo Cerrar Sesión para Administrador -->
-        <span v-if="isLoggedIn && isAdmin === 2" @click="handleAuthAction" class="logout-admin">Cerrar Sesión</span>
-
-        <!-- Login para usuarios no logueados -->
+        <!-- Login (solo si no está logueado) -->
         <a v-if="!isLoggedIn" @click="goToLogin">Login</a>
       </div>
     </div>

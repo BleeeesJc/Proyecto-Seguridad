@@ -16,49 +16,34 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials) {
       this.loading = true;
       this.error = null;
-      console.log(credentials);
       try {
-        // Realizar la solicitud POST con datos en formato JSON
-        const response = await axios.post(
-          `${RutaApi.baseURL}auth/login`,
-          credentials,
-          {
-            headers: {
-              'Content-Type': 'application/json' // Asegura que se envíen los datos como JSON
-            }
+        const response = await axios.post(`${RutaApi.baseURL}auth/login`, credentials, {
+          headers: {
+            'Content-Type': 'application/json'
           }
-        );
-
+        });
+    
         if (response.status === 200) {
-          // Extrae el token del response
-          const { token } = response.data;
-          // Decodificar el token para obtener el rol
-          const decodedToken = jwtDecode(token);
-          const { rol } = decodedToken;
-          const { id } = decodedToken;
-
-          // Almacenar el token en el estado y en localStorage
-          this.token = token;
-          this.rol = rol;
-          this.id = id;
-          // Almacenar el token en localStorage
-          localStorage.setItem('token', token);
-          localStorage.setItem('rol', rol);
-          localStorage.setItem('id', id);
-          console.log("Token almacenado:", localStorage.getItem('token'));
-
-          console.log('Inicio de sesión exitoso');
-
+          const usuario = response.data; // Incluye token, idusuario, rol con permisos, etc.
+    
+          // Guardar en localStorage todo el usuario
+          localStorage.setItem('usuario', JSON.stringify(usuario));
+          localStorage.setItem('token', usuario.token);
+    
+          // Actualizar el store
+          this.token = usuario.token;
+          this.user = usuario;
+          this.rol = usuario.rol?.rol || null; // Solo el nombre del rol
+          this.id = usuario.idusuario;
+    
+          console.log("Usuario autenticado:", usuario);
           return true;
         } else {
           this.error = 'Error en el inicio de sesión';
-          console.error('Error en el inicio de sesión, código de estado:', response.status);
           return false;
         }
       } catch (error) {
-        // Maneja el error de la solicitud
         this.error = error.response?.data?.message || 'Error en la solicitud de inicio de sesión';
-        console.error('Error en la solicitud de inicio de sesión:', error);
         return false;
       } finally {
         this.loading = false;
