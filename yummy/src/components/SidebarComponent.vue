@@ -28,7 +28,7 @@ export default {
       permisos: {},
       rutasVisibles: [
         { to: "/panelAdministrativo/rol", label: "Rol", permiso: "roles" },
-        { to: "/panelAdministrativo/section1", label: "Dashboard", permiso: "paneladmin" },
+        { to: "/panelAdministrativo/section1", label: "Dashboard", permiso: "reportes" },
         { to: "/panelAdministrativo/ofertas", label: "Ofertas", permiso: "ofertas" },
         { to: "/panelAdministrativo/usuarios", label: "Usuarios", permiso: "usuarios" },
         { to: "/panelAdministrativo/platillos", label: "Platillos", permiso: "platillos" },

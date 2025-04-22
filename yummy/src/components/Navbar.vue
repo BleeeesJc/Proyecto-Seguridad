@@ -10,12 +10,12 @@
         <a><router-link to="/ofertas">Ofertas</router-link></a>
 
         <!-- Realizar Pedido -->
-        <a v-if="isLoggedIn && (isAdmin === 2 || isAdmin === 3)">
-          <router-link to="/menumesero">Realizar Pedido</router-link>
-        </a>
-        <a v-else>
-          <router-link to="/menupedido">Realizar Pedido</router-link>
-        </a>
+  <a v-if="isLoggedIn && (permisos.usuarios || permisos.paneladmin)">
+    <router-link to="/menumesero">Realizar Pedido</router-link>
+  </a>
+  <a v-else>
+    <router-link to="/menupedido">Realizar Pedido</router-link>
+  </a>
 
         <!-- Mapa Interactivo -->
         <a v-if="isLoggedIn && isAdmin !== 2">
@@ -25,12 +25,13 @@
         <!-- Menú siempre visible -->
         <a><router-link to="/menu">Menu</router-link></a>
 
-        <!-- Panel Administrativo (todos excepto rol 1) -->
-        <a v-if="isLoggedIn && isAdmin !== 1">
-          <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
-        </a>
+        <!-- Panel Administrativo con permisos de paneladmin -->
+<a v-if="isLoggedIn && permisos.paneladmin">
+  <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
+</a>
 
-        <!-- Dropdown de opciones (todos excepto rol 1) -->
+
+        <!-- Dropdown de opciones -->
         <div v-if="isLoggedIn && isAdmin !== 1" class="dropdown" @mouseleave="closeDropdown">
           <button class="dropdown-btn" @click="toggleDropdown">Opciones</button>
           <div v-if="dropdownVisible" class="dropdown-content">
@@ -56,15 +57,17 @@ export default {
   name: "NavbarComponent",
   data() {
     return {
-      isLoggedIn: false, // Estado de autenticación
-      isAdmin: '', // Rol del usuario
+      isLoggedIn: false,
+      permisos: {},
       dropdownVisible: false,
     };
   },
   mounted() {
-    // Verifica si hay un token al cargar el componente
-    this.isLoggedIn = !!localStorage.getItem('token');
-    this.isAdmin = parseInt(localStorage.getItem("rol"), 10);
+    const token = localStorage.getItem('token');
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    this.isLoggedIn = !!token && !!usuario;
+    this.permisos = usuario?.rol || {}; // ← esto es clave para tu lógica nueva
   },
   methods: {
     toggleDropdown() {
@@ -80,18 +83,17 @@ export default {
       this.$router.push('/iniciarsesion');
     },
     handleAuthAction() {
-      if (this.isLoggedIn) {
-        // Si el usuario está logueado, cerrar sesión
-        localStorage.removeItem('token');
-        localStorage.removeItem('id');
-        localStorage.removeItem('rol'); // Elimina el token del almacenamiento local
-        this.isLoggedIn = false;
-        this.$router.push('/'); // Redirige al Home después de cerrar sesión
-      }
+      localStorage.removeItem('token');
+      localStorage.removeItem('id');
+      localStorage.removeItem('rol');
+      localStorage.removeItem('usuario');
+      this.isLoggedIn = false;
+      this.$router.push('/');
     },
   },
 };
 </script>
+
 
 <style scoped>
 /* Estilos */
