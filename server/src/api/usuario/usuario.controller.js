@@ -1,6 +1,8 @@
 // src/api/usuario.controller.js
 const sequelize = require('../../config/db');
 const bcrypt = require('bcrypt');
+const HistoricoContrasenas = require('../historico_contrasenas/historico_contrasenas.model'); // Importar el modelo
+
 
 // Crear un nuevo usuario
 exports.registrarUsuario = async (req, res) => {
@@ -186,35 +188,72 @@ exports.obtenerUsuarioPorCorreo = async (req, res) => {
   }
 };
 
-// Actualizar solo la contraseña
+// Actualizar contraseña con validación de histórico
 exports.actualizarContrasena = async (req, res) => {
-  const { id } = req.params; // Obtiene el id del usuario desde los parámetros de la URL
-  const { newPassword } = req.body; // Obtiene la nueva contraseña desde el cuerpo de la solicitud
+  const { id } = req.params; 
+  const { newPassword } = req.body; 
 
   console.log("ID recibido:", id);
-
   console.log("Nueva contraseña:", newPassword);
-  try {
-    // Asegúrate de hashear la nueva contraseña antes de almacenarla
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Ejecuta la consulta para actualizar solo el campo de la contraseña
-    const [actualizado] = await sequelize.query(
-      `UPDATE usuario SET password = :password WHERE idUsuario = :id`,
+  try {
+    // Hashear la nueva contraseña
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Obtener la contraseña actual del usuario
+    const [usuarioActual] = await sequelize.query(
+      `SELECT password FROM usuario WHERE idusuario = :id`,
       {
-        replacements: { id, password: hashedPassword },
+        replacements: { id },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (!usuarioActual) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const passwordActual = usuarioActual.password;
+
+    // Primero: comparar contra la contraseña actual
+    const esMismaActual = await bcrypt.compare(newPassword, passwordActual);
+    if (esMismaActual) {
+      return res.status(400).json({ message: 'No puedes usar tu contraseña actual nuevamente.' });
+    }
+
+    // Segundo: comparar contra las contraseñas del histórico
+    const historicos = await HistoricoContrasenas.findAll({
+      where: { idusuario: id }
+    });
+
+    for (const registro of historicos) {
+      const coincide = await bcrypt.compare(newPassword, registro.password);
+      if (coincide) {
+        return res.status(400).json({ message: 'No puedes usar una contraseña que ya hayas usado anteriormente.' });
+      }
+    }
+
+    // **Importante**: Guardar la contraseña actual en el histórico ANTES de actualizar
+    await HistoricoContrasenas.create({
+      idusuario: id,
+      password: passwordActual,
+      fecha_cambio: new Date()
+    });
+
+    // Ahora sí: actualizar la contraseña nueva en usuario
+    await sequelize.query(
+      `UPDATE usuario SET password = :password WHERE idusuario = :id`,
+      {
+        replacements: { password: hashedNewPassword, id },
         type: sequelize.QueryTypes.UPDATE,
       }
     );
 
-    if (actualizado) {
-      res.json({ message: 'Contraseña actualizada exitosamente' });
-    } else {
-      res.status(404).json({ error: 'Usuario no encontrado' });
-    }
+    res.json({ message: 'Contraseña actualizada exitosamente' });
+
   } catch (error) {
     console.error("Error al actualizar la contraseña:", error);
-    res.status(500).json({ error: 'Error al actualizar la contraseña' });
+    res.status(500).json({ message: 'Error al actualizar la contraseña', error: error.message });
   }
 };
 
