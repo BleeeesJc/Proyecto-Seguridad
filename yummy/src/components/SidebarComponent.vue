@@ -27,14 +27,14 @@ export default {
       selectedSection: 'DashboardComponent',
       permisos: {},
       rutasVisibles: [
-        { to: "/panelAdministrativo/rol", label: "Rol", permiso: "roles" },
-        { to: "/panelAdministrativo/section1", label: "Dashboard", permiso: "reportes" },
+        { to: "/panelAdministrativo/rol", label: "Rol", permiso: "asignacionroles" },
+        { to: "/panelAdministrativo/section1", label: "Dashboard", permiso: "dashboard" },
         { to: "/panelAdministrativo/ofertas", label: "Ofertas", permiso: "ofertas" },
         { to: "/panelAdministrativo/usuarios", label: "Usuarios", permiso: "usuarios" },
         { to: "/panelAdministrativo/platillos", label: "Platillos", permiso: "platillos" },
-        { to: "/panelAdministrativo/pedidosadmin", label: "Pedidos", permiso: "pagos" },
+        { to: "/panelAdministrativo/pedidosadmin", label: "Pedidos", permiso: "pedidos" },
         { to: "/panelAdministrativo/reservas", label: "Reservas", permiso: "reservas" },
-        { to: "/panelAdministrativo/mapa", label: "Mapa Interactivo", permiso: "mesas" }
+        { to: "/panelAdministrativo/mapa", label: "Mapa Interactivo", permiso: "mapainteractivo" }
       ]
     };
   },

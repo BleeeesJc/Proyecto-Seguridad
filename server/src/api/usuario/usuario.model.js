@@ -29,7 +29,7 @@ const Usuario = sequelize.define('Usuario', {
   idrol: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 1, ///Rol por defecto
+    defaultValue: 5, ///Rol por defecto
     references: {
       model: 'rol',
       key: 'idrol',

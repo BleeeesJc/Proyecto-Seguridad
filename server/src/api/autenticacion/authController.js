@@ -20,17 +20,20 @@ const login = async (req, res) => {
         attributes: [
           'idrol',
           'rol',
-          'pagos',
-          'reservas',
-          'menu',
+          'asignacionroles',
+          'dashboard',
           'ofertas',
           'usuarios',
           'platillos',
-          'mesas',
-          'paneladmin',
-          'roles',
-          'reportes'
+          'pedidos',
+          'reservas',
+          'mapainteractivo',
+          'ofertacliente',
+          'pedidocliente',
+          'mapacliente',
+          'menucliente'
         ]
+        
       }
     });
 

@@ -12,15 +12,11 @@ const Rol = sequelize.define('Rol', {
     type: DataTypes.STRING(25),
     allowNull: false,
   },
-  pagos: {
+  asignacionroles: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  reservas: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-  },
-  menu: {
+  dashboard: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
@@ -36,19 +32,31 @@ const Rol = sequelize.define('Rol', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  mesas: {
+  pedidos: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  paneladmin: {
+  reservas: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  roles: {
+  mapainteractivo: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  reportes: {
+  ofertacliente: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  pedidocliente: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  mapacliente: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
+  menucliente: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
