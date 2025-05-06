@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Usuario = require('../usuario/usuario.model');
+const axios = require('axios');
 
 console.log("se carga el authcontroller")
 
@@ -8,6 +9,25 @@ console.log("se carga el authcontroller")
 const login = async (req, res) => {
   const { correo, password } = req.body;
 
+  //Verificacion de reCAPTCHA de GOOGLE
+  const captchaToken = req.body['g-recaptcha-response'];
+  try {
+    const captchaResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY, // 🔐 Mejor que esté en .env
+        response: captchaToken
+      }
+    });
+
+    if (!captchaResponse.data.success) {
+      return res.status(400).json({ message: 'Error en CAPTCHA. Intenta de nuevo.' });
+    }
+  } catch (error) {
+    console.error('Error al verificar CAPTCHA:', error);
+    return res.status(500).json({ message: 'Error al verificar CAPTCHA' });
+  }
+
+  //Validacion de usuario y contraseña
   try {
     // Verifica si el usuario existe
     const user = await Usuario.findOne({ where: { correo } });
