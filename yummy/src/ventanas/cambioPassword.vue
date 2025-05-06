@@ -62,16 +62,32 @@ export default {
       this.showPassword = !this.showPassword;
     },
     async changePassword() {
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+      const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{12,}$/;
 
   if (!passwordRegex.test(this.password)) {
     Swal.fire({
       icon: 'error',
       title: 'Contraseña inválida',
-      text: 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial.',
+      text: 'La contraseña debe tener al menos 12 caracteres, una letra mayúscula, un número y un carácter especial.',
     });
     return;
   }
+
+  // Detectar secuencias numéricas simples como 123, 4567, 0000, 1111, etc.
+  function tieneSecuenciaNumerica(password) {
+    const secuenciaRegex = /(012|123|234|345|456|567|678|789|000|111|222|333|444|555|666|777|888|999)/;
+    return secuenciaRegex.test(password);
+  }
+
+  if (tieneSecuenciaNumerica(this.password)) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Contraseña insegura',
+    text: 'No uses secuencias numéricas obvias como "123", "000" o "111".',
+  });
+  return;
+}
+
 
   try {
     const userId = this.$route.params.id; 
