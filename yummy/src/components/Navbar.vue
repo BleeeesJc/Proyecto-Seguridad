@@ -4,23 +4,35 @@
       <!-- Logo -->
       <img src="@/assets/images/logoprincipal.jpeg" alt="Imagen del logo" class="logo" style="width: 120px;" @click="goToHome">
       <h1>Tu lugar para compartir y disfrutar</h1>
-      
+
       <div class="opciones">
-        <a><router-link to="/ofertas">Ofertas</router-link></a>
-        
-        <a v-if="(isLoggedIn && isAdmin === 2) || (isLoggedIn && isAdmin === 3) ">
-          <router-link to="/menumesero">Realizar Pedido</router-link>
-        </a>
-        <a v-else><router-link to="/menupedido">Realizar Pedido</router-link></a>
-
-        <a v-if="isLoggedIn && isAdmin != 2"><router-link to="/mapa">Mapa Interactivo</router-link></a>
-        <a><router-link to="/menu">Menu</router-link></a>
-        <a v-if="isLoggedIn && isAdmin === 2">
-          <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
+        <!-- Ofertas -->
+        <a v-if="isLoggedIn && permisos.ofertacliente">
+          <router-link to="/ofertas">Ofertas</router-link>
         </a>
 
-        <!-- Botón Opciones -->
-        <div v-if="isLoggedIn && isAdmin !== 2" class="dropdown" @mouseleave="closeDropdown">
+        <!-- Realizar Pedido -->
+        <a v-if="isLoggedIn && permisos.pedidocliente">
+          <router-link to="/menupedido">Realizar Pedido</router-link>
+        </a>
+
+        <!-- Mapa Interactivo -->
+        <a v-if="isLoggedIn && permisos.mapacliente">
+          <router-link to="/mapa">Mapa Interactivo</router-link>
+        </a>
+
+        <!-- Menú -->
+        <a v-if="isLoggedIn && permisos.menucliente">
+          <router-link to="/menu">Menú</router-link>
+        </a>
+
+<!-- Panel Administrativo (solo si tiene permisos correctos) -->
+<a v-if="isLoggedIn && puedeVerPanelAdmin">
+  <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
+</a>
+
+        <!-- Dropdown de opciones -->
+        <div v-if="isLoggedIn && isAdmin !== 1" class="dropdown" @mouseleave="closeDropdown">
           <button class="dropdown-btn" @click="toggleDropdown">Opciones</button>
           <div v-if="dropdownVisible" class="dropdown-content">
             <router-link to="/mispedidos">Mis Pedidos</router-link>
@@ -30,11 +42,10 @@
           </div>
         </div>
 
+        <!-- Cerrar sesión directo (si no es rol 1) -->
+        <span v-if="isLoggedIn && isAdmin !== 1" @click="handleAuthAction" class="logout-admin">Cerrar Sesión</span>
 
-        <!-- Solo Cerrar Sesión para Administrador -->
-        <span v-if="isLoggedIn && isAdmin === 2" @click="handleAuthAction" class="logout-admin">Cerrar Sesión</span>
-
-        <!-- Login para usuarios no logueados -->
+        <!-- Login (solo si no está logueado) -->
         <a v-if="!isLoggedIn" @click="goToLogin">Login</a>
       </div>
     </div>
@@ -46,15 +57,31 @@ export default {
   name: "NavbarComponent",
   data() {
     return {
-      isLoggedIn: false, // Estado de autenticación
-      isAdmin: '', // Rol del usuario
+      isLoggedIn: false,
+      permisos: {},
       dropdownVisible: false,
     };
   },
+  computed: {
+    puedeVerPanelAdmin() {
+      return (
+        this.permisos.asignacionroles ||
+        this.permisos.dashboard ||
+        this.permisos.ofertas ||
+        this.permisos.usuarios ||
+        this.permisos.platillos ||
+        this.permisos.pedidos ||
+        this.permisos.reservas ||
+        this.permisos.mapainteractivo
+      );
+    }
+  },
   mounted() {
-    // Verifica si hay un token al cargar el componente
-    this.isLoggedIn = !!localStorage.getItem('token');
-    this.isAdmin = parseInt(localStorage.getItem("rol"), 10);
+    const token = localStorage.getItem('token');
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    this.isLoggedIn = !!token && !!usuario;
+    this.permisos = usuario?.rol || {}; 
   },
   methods: {
     toggleDropdown() {
@@ -70,37 +97,42 @@ export default {
       this.$router.push('/iniciarsesion');
     },
     handleAuthAction() {
-      if (this.isLoggedIn) {
-        // Si el usuario está logueado, cerrar sesión
-        localStorage.removeItem('token');
-        localStorage.removeItem('id');
-        localStorage.removeItem('rol'); // Elimina el token del almacenamiento local
-        this.isLoggedIn = false;
-        this.$router.push('/'); // Redirige al Home después de cerrar sesión
-      }
+      localStorage.removeItem('token');
+      localStorage.removeItem('id');
+      localStorage.removeItem('rol');
+      localStorage.removeItem('usuario');
+      this.isLoggedIn = false;
+      this.$router.push('/');
     },
   },
 };
 </script>
 
+
+
 <style scoped>
 /* Estilos */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
+
 .opciones {
   text-align: end;
 }
+
 .opciones a {
   padding-right: 3%;
   text-decoration: none;
   color: white;
 }
+
 .opciones a:hover {
   text-decoration: underline;
   color: black;
 }
+
 .navIzquierda h1 {
   color: aliceblue;
   font-size: 2vh;
@@ -109,6 +141,7 @@ html, body {
   padding-right: 5%;
   padding-left: 5%;
 }
+
 .nav-container {
   background-color: #FE9900;
   padding: 10px 20px;
@@ -116,6 +149,7 @@ html, body {
   top: 0;
   width: 100%;
 }
+
 .logo {
   width: 40px;
   margin-left: 0%;

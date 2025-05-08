@@ -28,13 +28,11 @@ exports.getRolById = async (req, res) => {
 exports.createRol = async (req, res) => {
   try {
     const {
-      rol, pagos, reservas, menu, ofertas,
-      usuarios, platillos, mesas, paneladmin, roles, reportes
+      rol, asignacionroles, dashboard, ofertas,usuarios,platillos,pedidos,reservas,mapainteractivo,ofertacliente,pedidocliente,mapacliente,menucliente
     } = req.body;
 
     const newRol = await Rol.create({
-      rol, pagos, reservas, menu, ofertas,
-      usuarios, platillos, mesas, paneladmin, roles, reportes
+      rol, asignacionroles, dashboard, ofertas, usuarios,platillos, pedidos, reservas, mapainteractivo, ofertacliente, pedidocliente, mapacliente,menucliente
     });
     return res.status(201).json(newRol);
   } catch (error) {
@@ -45,9 +43,9 @@ exports.createRol = async (req, res) => {
 
 exports.updateRol = async (req, res) => {
   const { id } = req.params;
-  const { rol, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes } = req.body;
+  const { rol, asignacionroles, dashboard, ofertas,usuarios,platillos,pedidos,reservas,mapainteractivo,ofertacliente,pedidocliente,mapacliente,menucliente } = req.body;
   try {
-    const [updated] = await Rol.update({ rol, pagos, reservas, menu, ofertas, usuarios, platillos, mesas, paneladmin, roles, reportes }, {
+    const [updated] = await Rol.update({ rol, asignacionroles, dashboard, ofertas, usuarios,platillos, pedidos, reservas, mapainteractivo, ofertacliente, pedidocliente, mapacliente,menucliente }, {
       where: { idrol: id }
     });
     if (!updated) {
