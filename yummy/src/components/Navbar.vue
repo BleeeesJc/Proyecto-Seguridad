@@ -28,7 +28,7 @@
 
 <!-- Panel Administrativo (solo si tiene permisos correctos) -->
 <a v-if="isLoggedIn && puedeVerPanelAdmin">
-  <router-link to="/panelAdministrativo">Panel Administrativo</router-link>
+  <router-link to="/panelAdministrativo">Panel</router-link>
 </a>
 
         <!-- Dropdown de opciones -->
