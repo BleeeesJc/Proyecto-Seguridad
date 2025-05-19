@@ -1,7 +1,21 @@
 // src/api/usuario.controller.js
 const sequelize = require('../../config/db');
+const emailExistence = require('email-existence');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const HistoricoContrasenas = require('../historico_contrasenas/historico_contrasenas.model'); // Importar el modelo
+
+
+const verificationCodes = {}; // temporal
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: { rejectUnauthorized: false },
+});
 
 
 // Crear un nuevo usuario
@@ -324,62 +338,61 @@ exports.autenticarUsuario = async (req, res) => {
 };
 
 
-
-const nodemailer = require('nodemailer');
-
-const verificationCodes = {};//temporal
-
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // Solo porque a mi no me funciona el autofirmado
-  },
-});
-
-exports.enviarCodigo = async (req, res) => {
+exports.enviarCodigo = (req, res) => {
   const { email } = req.body;
 
-  try {
-    const usuarios = await sequelize.query(
-      `SELECT idUsuario FROM usuario WHERE correo = :email`,
-      {
-        replacements: { email },
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-
-    if (usuarios.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'El correo no existe',
-      });
-    }
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);
-    verificationCodes[email] = verificationCode;
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Código de verificación',
-      text: `Tu código de verificación es: ${verificationCode}`,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    res.json({ success: true, message: 'Código de verificación enviado.' });
-  } catch (error) {
-    console.error("Error al enviar el código de verificación:", error);
-    res.status(500).json({
+  // 1️⃣ Validación básica de sintaxis
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    return res.status(400).json({
       success: false,
-      message: 'Error interno al intentar enviar el código.',
-      error: error.message,
+      message: 'Formato de correo inválido.',
     });
   }
+
+  // 2️⃣ Comprobación de existencia en el servidor receptor
+  emailExistence.check(email, async (err, exists) => {
+    if (err) {
+      console.error('Error al verificar existencia de email:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'No fue posible verificar el correo.',
+      });
+    }
+
+    if (!exists) {
+      // 3️⃣ Si no existe, devolver error
+      return res.status(404).json({
+        success: false,
+        message: 'El correo no existe o no se puede alcanzar.',
+      });
+    }
+
+    try {
+      // 4️⃣ Si existe, generamos y guardamos el código
+      const verificationCode = Math.floor(100000 + Math.random() * 900000);
+      verificationCodes[email] = verificationCode;
+      console.log(`Código para ${email}: ${verificationCode}`);
+
+      // 5️⃣ Y enviamos el correo
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Código de verificación',
+        text: `Tu código de verificación es: ${verificationCode}`,
+      });
+
+      res.json({ success: true, message: 'Código de verificación enviado.' });
+    } catch (error) {
+      console.error('Error al enviar el correo:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno al enviar el código.',
+      });
+    }
+  });
 };
+
 
 exports.enviarConfirmacionPedido = async (req, res) => {
   const { idUsuario, detalles, precio_total } = req.body;
