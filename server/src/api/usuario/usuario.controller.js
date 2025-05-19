@@ -20,29 +20,32 @@ const transporter = nodemailer.createTransport({
 
 // Crear un nuevo usuario
 exports.registrarUsuario = async (req, res) => {
-  const { nombre, apellidos, email, password } = req.body;
+  const { nombre, apellidos, email, password, idrol } = req.body;
 
   try {
-    console.log('Datos recibidos para registro:', { nombre, apellidos, email });
+    console.log('Datos recibidos para registro:', { nombre, apellidos, email, idrol });
 
-    // Paso 1: Buscar el rol de "usuario"
-    const [rol] = await sequelize.query(
-      `SELECT idrol FROM rol WHERE rol = 'usuario'`,
-      { type: sequelize.QueryTypes.SELECT }
-    );
-
-    console.log('Rol encontrado:', rol);
-
-    // Verificar si el rol fue encontrado
-    if (!rol || !rol.idrol) {
-      return res.status(500).json({ message: 'El rol de usuario no existe en la base de datos' });
+    // Paso 1: Determinar idrol a usar
+    let rolId = idrol;
+    if (!rolId) {
+      // Asigna rol por defecto 'usuario' si no viene
+      const [rolUsuario] = await sequelize.query(
+        `SELECT idrol FROM rol WHERE rol = 'usuario'`,
+        { type: sequelize.QueryTypes.SELECT }
+      );
+      rolId = rolUsuario?.idrol;
     }
 
-    // Paso 2: Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('Contraseña encriptada:', hashedPassword);
+    if (!rolId) {
+      return res
+        .status(500)
+        .json({ message: "No se pudo determinar un rol válido para el usuario" });
+    }
 
-    // Paso 3: Insertar el nuevo usuario con el rol de "usuario"
+    // Paso 2: Encriptar contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Paso 3: Insertar el usuario
     await sequelize.query(
       `INSERT INTO usuario (nombre, apellidos, correo, password, idrol)
        VALUES (:nombre, :apellidos, :email, :password, :idrol)`,
@@ -51,15 +54,16 @@ exports.registrarUsuario = async (req, res) => {
           nombre,
           apellidos,
           email,
-          password: hashedPassword, // Contraseña encriptada
-          idrol: rol.idrol, // ID del rol de "usuario"
+          password: hashedPassword,
+          idrol: rolId
         },
         type: sequelize.QueryTypes.INSERT,
       }
     );
 
-    console.log('Usuario registrado exitosamente');
+    console.log('Usuario registrado exitosamente con rol:', rolId);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
+
   } catch (error) {
     console.error('Error al registrar el usuario:', error);
     res.status(500).json({ message: 'Error al registrar el usuario', error: error.message });
