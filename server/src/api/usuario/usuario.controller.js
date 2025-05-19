@@ -344,9 +344,21 @@ exports.enviarCodigo = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);//genera codigo de 6 digitos
+    const usuarios = await sequelize.query(
+      `SELECT idUsuario FROM usuario WHERE correo = :email`,
+      {
+        replacements: { email },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
-    // Guarda el código temporalmente (en producción, usa una base de datos o Redis)
+    if (usuarios.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'El correo no existe',
+      });
+    }
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
     verificationCodes[email] = verificationCode;
 
     const mailOptions = {
@@ -358,10 +370,14 @@ exports.enviarCodigo = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.json({ success: true, message: 'Código de verificación enviado' });
+    res.json({ success: true, message: 'Código de verificación enviado.' });
   } catch (error) {
     console.error("Error al enviar el código de verificación:", error);
-    res.status(500).json({ success: false, message: 'Error al enviar el código de verificación', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Error interno al intentar enviar el código.',
+      error: error.message,
+    });
   }
 };
 
