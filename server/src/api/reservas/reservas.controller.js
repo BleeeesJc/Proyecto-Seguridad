@@ -15,10 +15,11 @@ const transporter = nodemailer.createTransport({
 
 exports.crearReserva = async (req, res) => {
     const { idusuario, idmesa, fecha, hora, estado } = req.body; // Extraer datos del body
-    console.log("Datos recibidos para crear reserva:", req.body);
+    console.log(`[Reserva] Crear | Usuario: ${idusuario}, Mesa: ${idmesa}, Fecha: ${fecha} ${hora}, Estado: ${estado}`);
 
     // Validar que todos los campos requeridos estén presentes
     if (!idusuario || !idmesa || !fecha || !hora || estado === undefined) {
+        console.warn('[Reserva] Datos incompletos en creación');
         return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -32,19 +33,21 @@ exports.crearReserva = async (req, res) => {
                 type: sequelize.QueryTypes.INSERT,
             }
         );
-
+        console.log('[Reserva] Registro insertado en BD');
         // Obtener información del usuario
         const usuario = await Usuario.findOne({ where: { idusuario: idusuario } });
         if (!usuario) {
+            console.warn(`[Reserva] Usuario no encontrado | ID: ${idusuario}`);
             return res.status(404).json({ error: 'Usuario no encontrado.' });
         }
 
         // Obtener información de la mesa
         const mesa = await Mesa.findOne({ where: { idmesa: idmesa, visible: true } });
         if (!mesa) {
+            console.warn(`[Reserva] Mesa no encontrada o no visible | ID: ${idmesa}`);
             return res.status(404).json({ error: 'Mesa no encontrada o no está visible.' });
         }
-
+        console.log(`[Reserva] Mesa encontrada | Nombre: ${mesa.nombre}`);
         // Configurar contenido del correo
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -67,20 +70,21 @@ exports.crearReserva = async (req, res) => {
 
         // Enviar correo
         await transporter.sendMail(mailOptions);
-
+        console.log(`[Reserva] Correo enviado a ${usuario.correo}`);
         // Responder con éxito
         res.status(201).json({ 
             message: 'Reserva creada y correo enviado exitosamente', 
             data: nuevaReserva 
         });
     } catch (error) {
-        console.error("Error al crear la reserva:", error);
+        console.error(`[Reserva] Error al crear la reserva | ${error.message}`);
         res.status(500).json({ error: 'Error al crear la reserva' });
     }
 };
 
 // Obtener todas las reservas
 exports.obtenerReservas = async (req, res) => {
+    console.log('[Reserva] Obtener todas');
     try {
         const reservas = await sequelize.query(
             `SELECT r.idreserva, r.idusuario, r.idmesa, r.fecha, r.hora, r.estado, u.nombre AS nombre
@@ -88,9 +92,10 @@ exports.obtenerReservas = async (req, res) => {
              JOIN usuario u ON r.idusuario = u.idusuario`,
             { type: sequelize.QueryTypes.SELECT }
         );
+        console.log(`[Reserva] Reservas obtenidas: ${reservas.length}`);
         res.json(reservas);
     } catch (error) {
-        console.error("Error al obtener las reservas:", error);
+        console.error(`[Reserva] Error al obtener las reservas | ${error.message}`);
         res.status(500).json({ error: 'Error al obtener las reservas' });
     }
 };
@@ -100,23 +105,9 @@ exports.actualizarReserva = async (req, res) => {
     const { id } = req.params;
     const { fecha, hora, estado, idusuario, idmesa } = req.body;
 
-    console.log("Datos antes de la consulta SQL:", {
-        id,
-        fecha,
-        hora,
-        estado: typeof estado, // Debe ser number
-        idusuario: typeof idusuario, // Debe ser number
-        idmesa: typeof idmesa, // Debe ser number
-      });
-      
-    console.log("Datos recibidos en el backend para actualizar:", {
-        id,
-        fecha,
-        hora,
-        estado,
-        idusuario,
-        idmesa
-    });
+    console.log(`[Reserva] Actualizar | ID: ${id}`);
+
+    console.log('[Reserva] Datos recibidos:', { id, fecha, hora, estado, idusuario, idmesa });
 
     try {
         const [actualizado] = await sequelize.query(
@@ -130,12 +121,14 @@ exports.actualizarReserva = async (req, res) => {
         );
 
         if (actualizado) {
+            console.log(`[Reserva] Reserva actualizada | ID: ${id}`);
             res.json({ message: 'Reserva actualizada exitosamente' });
         } else {
+            console.warn(`[Reserva] Reserva no encontrada para actualizar | ID: ${id}`);
             res.status(404).json({ error: 'Reserva no encontrada' });
         }
     } catch (error) {
-        console.error("Error al actualizar la reserva:", error);
+        cconsole.error(`[Reserva] Error al actualizar la reserva | ${error.message}`);
         res.status(500).json({ error: 'Error al actualizar la reserva' });
     }
 };
@@ -144,7 +137,7 @@ exports.actualizarReserva = async (req, res) => {
 // Eliminar una reserva
 exports.eliminarReserva = async (req, res) => {
     const { id } = req.params;
-
+    console.log(`[Reserva] Eliminar | ID: ${id}`);
     try {
         const eliminado = await sequelize.query(
             `DELETE FROM reserva WHERE idreserva = :id`,
@@ -155,19 +148,22 @@ exports.eliminarReserva = async (req, res) => {
         );
 
         if (eliminado) {
+            console.log(`[Reserva] Reserva eliminada | ID: ${id}`);
             res.status(204).json();
         } else {
+            console.warn(`[Reserva] Reserva no encontrada para eliminar | ID: ${id}`);
             res.status(404).json({ error: 'Reserva no encontrada' });
         }
     } catch (error) {
-        console.error("Error al eliminar la reserva:", error);
+        console.error(`[Reserva] Error al eliminar la reserva | ${error.message}`);
         res.status(500).json({ error: 'Error al eliminar la reserva' });
     }
 };
 exports.verificarDisponibilidad = async (req, res) => {
     const { idmesa, fecha, hora, idreserva } = req.query;
-    console.log("Parámetros recibidos:", { idmesa, fecha, hora, idreserva });
+    console.log('[Reserva] Verificar disponibilidad:', { idmesa, fecha, hora, idreserva });
     if (!idmesa || !fecha || !hora) {
+        console.warn('[Reserva] Parámetros inválidos en disponibilidad');
         return res.status(400).json({ error: 'Parámetros inválidos o incompletos.' });
     }
     try {
@@ -189,8 +185,9 @@ exports.verificarDisponibilidad = async (req, res) => {
             return res.json({ disponible: false });
         }
         res.json({ disponible: true });
+        console.log(`[Reserva] Disponibilidad para Mesa ${idmesa} en ${fecha} ${hora}: ${disponible}`);
     } catch (error) {
-        console.error("Error al verificar disponibilidad:", error);
+        console.error(`[Reserva] Error al verificar disponibilidad | ${error.message}`);
         res.status(500).json({ error: 'Error al verificar disponibilidad' });
     }
 };
@@ -198,7 +195,7 @@ exports.verificarDisponibilidad = async (req, res) => {
 // Controlador para verificar si el usuario está registrado
 exports.verificarUsuario = async (req, res) => {
     const { idusuario } = req.query;
-
+    console.log(`[Reserva] Verificar usuario registrado | ID: ${idusuario}`);
     try {
         const [usuario] = await sequelize.query(
             `SELECT * FROM usuario WHERE idusuario = :idusuario`,
@@ -213,13 +210,15 @@ exports.verificarUsuario = async (req, res) => {
         }
 
         res.json({ registrado: true });
+        console.log(`[Reserva] Usuario ${idusuario} registrado: ${registrado}`);
     } catch (error) {
-        console.error("Error al verificar usuario:", error);
-        res.status(500).json({ error: "Error al verificar usuario" });
+        console.error(`[Reserva] Error al verificar usuario | ${error.message}`);
+        res.status(500).json({ error: 'Error al verificar usuario' });
     }
 };
 
 exports.enviarRecordatorios = async () => {
+    console.log('[Reserva] Enviar recordatorios iniciando');
     try {
         const ahora = new Date();
         const seisHorasDespues = new Date(ahora.getTime() + 6 * 60 * 60 * 1000);
@@ -239,7 +238,7 @@ exports.enviarRecordatorios = async () => {
                 type: sequelize.QueryTypes.SELECT,
             }
         );
-
+        console.log(`[Reserva] Recordatorios a enviar: ${reservas.length}`);
         // Enviar correo por cada reserva encontrada
         for (const reserva of reservas) {
             const mailOptions = {
@@ -262,19 +261,22 @@ exports.enviarRecordatorios = async () => {
             };
 
             await transporter.sendMail(mailOptions);
-            console.log(`Recordatorio enviado a ${reserva.email}`);
+            console.log(`[Reserva] Recordatorio enviado a ${reserva.correo}`);
         }
 
-        console.log('Todos los recordatorios han sido enviados.');
+         console.log('[Reserva] Todos los recordatorios enviados');
     } catch (error) {
-        console.error('Error al enviar recordatorios:', error);
+        console.error(`[Reserva] Error al enviar recordatorios | ${error.message}`);
     }
 };
 
 
 exports.obtenerReservasPorUsuario = async (req, res) => {
     const { idUsuario } = req.params;
-    if (!idUsuario) {
+    console.log(`[Reserva] Obtener por usuario | Usuario: ${idUsuario}`);
+
+     if (!idUsuario) {
+        console.warn('[Reserva] Falta idUsuario en parámetros');
         return res.status(400).json({ error: 'El idUsuario es obligatorio.' });
     }
 
@@ -286,9 +288,10 @@ exports.obtenerReservasPorUsuario = async (req, res) => {
                 type: sequelize.QueryTypes.SELECT,
             }
         );
+        console.log(`[Reserva] Reservas obtenidas para usuario ${idUsuario}: ${reservas.length}`);
         res.json(reservas);
     } catch (error) {
-        console.error('Error al obtener reservas por usuario:', error);
+        console.error(`[Reserva] Error al obtener reservas por usuario | ${error.message}`);
         res.status(500).json({ error: 'Error al obtener reservas.' });
     }
 };

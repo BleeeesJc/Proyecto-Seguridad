@@ -14,19 +14,15 @@
 
         <label for="password">Contraseña:</label>
         <div class="password-container">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            id="password"
-            v-model="password"
-            required
-            placeholder="Ingresa tu contraseña"
-          />
+          <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password" required
+            placeholder="Ingresa tu contraseña" />
           <span @click="togglePasswordVisibility" class="toggle-password">
             <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
           </span>
         </div>
 
-        <p class="signup-text">¿Ya tienes una cuenta? <router-link to="/iniciarsesion">Inicia sesión aquí</router-link></p>
+        <p class="signup-text">¿Ya tienes una cuenta? <router-link to="/iniciarsesion">Inicia sesión aquí</router-link>
+        </p>
 
         <button type="submit" class="login-button">Listo</button>
       </form>
@@ -70,7 +66,7 @@ export default {
       showVerificationModal: false,
       showErrorModal: false,
       errorMessage: '',
-      showPassword: false, 
+      showPassword: false,
     };
   },
   methods: {
@@ -96,16 +92,15 @@ export default {
       }
 
       try {
-        // Paso 1: Verificar si el correo existe y enviar código de verificación
         const response = await axios.post('/api/usuario/enviar-codigo', { email: this.email });
-        
         if (response.data.success) {
           this.showVerificationModal = true;
         } else {
-          this.showError('El correo no existe o ocurrió un problema');
+          this.showError(response.data.message);
         }
       } catch (error) {
-        this.showError('No se pudo verificar el correo');
+        const msg = error.response?.data?.message || 'No se pudo verificar el correo';
+        this.showError(msg);
       }
     },
 
@@ -198,6 +193,7 @@ export default {
 .cancel-button:hover {
   background-color: #aaa;
 }
+
 .password-container {
   position: relative;
 }
@@ -210,75 +206,81 @@ export default {
   cursor: pointer;
   color: #666;
 }
+
 .login-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: #FFFEDC; /* Color de fondo */
-    }
-    
-    .login-card {
-      width: 65%;
-      padding: 2rem;
-      background: white;
-      border-radius: 3vh;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-    
-    .title {
-      color: #FE9900; /* Color naranja */
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 1.5rem;
-    }
-    
-    label {
-      display: block;
-      text-align: left;
-      margin-bottom: 0.5rem;
-      font-weight: bold;
-      color: #444;
-    }
-    
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    
-    .signup-text {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 1rem;
-    }
-    
-    .signup-text a {
-      color: #FE9900; /* Color naranja */
-      text-decoration: none;
-    }
-    
-    .signup-text a:hover {
-      text-decoration: underline;
-    }
-    
-    .login-button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #A16F23; /* Color marrón */
-      color: white;
-      font-size: 1rem;
-      border: none;
-      border-radius: 1.5vh;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    
-    .login-button:hover {
-      background-color: #A16F23; /* Color marrón más oscuro */
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #FFFEDC;
+  /* Color de fondo */
+}
+
+.login-card {
+  width: 65%;
+  padding: 2rem;
+  background: white;
+  border-radius: 3vh;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.title {
+  color: #FE9900;
+  /* Color naranja */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #444;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.signup-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.signup-text a {
+  color: #FE9900;
+  /* Color naranja */
+  text-decoration: none;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #A16F23;
+  /* Color marrón */
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 1.5vh;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-button:hover {
+  background-color: #A16F23;
+  /* Color marrón más oscuro */
+}
 </style>

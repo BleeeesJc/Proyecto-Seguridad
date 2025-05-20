@@ -1,115 +1,129 @@
-const Mesa = require('./mesasModel'); // Asegúrate de que la ruta al modelo sea correcta
+const Mesa = require('./mesasModel');
 
-
-// Función para obtener todas las actividades
+// Obtener todas las mesas visibles
 const obtenerMesa = async (req, res) => {
+  console.log('[Mesa] Obtener todas las mesas visibles');
+
   try {
-    const mesas = await Mesa.findAll({
-      where: { visible: true },
-    });
+    const mesas = await Mesa.findAll({ where: { visible: true } });
+    console.log(`Mesas obtenidas (${mesas.length} registros)`);
     res.status(200).json(mesas);
   } catch (error) {
-    console.error('Error al obtener actividades:', error);
+    console.error(`Error al obtener mesas: ${error.message}`);
     res.status(500).json({ error: 'Error al obtener las actividades' });
   }
 };
+
+// Obtener una mesa por ID
 const obtenerMesaPorId = async (req, res) => {
+  const { id } = req.params;
+  console.log(`[Mesa] Buscar por ID | ID: ${id}`);
+
   try {
-    const { id } = req.params; // Obtener el id de la mesa desde los parámetros de la ruta
-    const mesa = await Mesa.findOne({
-      where: { idmesa: id, visible: true }, // Verificar que la mesa es visible y coincide con el id
-    });
+    const mesa = await Mesa.findOne({ where: { idmesa: id, visible: true } });
 
     if (!mesa) {
+      console.warn(`Mesa no encontrada o no visible | ID: ${id}`);
       return res.status(404).json({ error: 'Mesa no encontrada o no está visible.' });
     }
 
+    console.log(`Mesa encontrada | ID: ${id}`);
     res.status(200).json(mesa);
   } catch (error) {
-    console.error('Error al obtener la mesa:', error);
+    console.error(`Error al obtener la mesa | ID: ${id} | ${error.message}`);
     res.status(500).json({ error: 'Error al obtener la mesa.' });
   }
 };
-// Función para crear una nueva actividad
-const crearMesa = async (req, res) => {
-  try {
-    const { nombre, capacidad, posx, posy } = req.body;
 
+// Crear una nueva mesa
+const crearMesa = async (req, res) => {
+  const { nombre, capacidad, posx, posy } = req.body;
+  console.log(`[Mesa] Crear | Nombre: ${nombre}, Capacidad: ${capacidad}, Posición: (${posx}, ${posy})`);
+
+  try {
     const nuevaMesa = await Mesa.create({ nombre, capacidad, posx, posy });
+    console.log(`Mesa creada | ID: ${nuevaMesa.idmesa}`);
     res.status(201).json(nuevaMesa);
   } catch (error) {
-    console.error('Error al crear Mesa:', error);
+    console.error(`Error al crear mesa: ${error.message}`);
     res.status(500).json({ error: 'Error al crear la Mesa' });
   }
 };
-// Función para actualizar una mesa
+
+// Actualizar una mesa existente
 const actualizarMesa = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { capacidad, nombre, posx, posy } = req.body;
-  
-      const mesa = await Mesa.findByPk(id);
-  
-      if (mesa) {
-        // Actualiza los campos de la mesa
-        mesa.capacidad = capacidad !== undefined ? capacidad : mesa.capacidad;
-        mesa.nombre = nombre !== undefined ? nombre : mesa.nombre;
-        mesa.posx = posx !== undefined ? posx : mesa.posx;
-        mesa.posy = posy !== undefined ? posy : mesa.posy;
-  
-        await mesa.save(); // Guarda los cambios en la base de datos
-  
-        res.status(200).json(mesa);
-      } else {
-        res.status(404).json({ error: 'Mesa no encontrada' });
-      }
-    } catch (error) {
-      console.error('Error al actualizar la mesa:', error);
-      res.status(500).json({ error: 'Error al actualizar la mesa' });
+  const { id } = req.params;
+  const { capacidad, nombre, posx, posy } = req.body;
+  console.log(`🔧 [Mesa] Actualizar | ID: ${id}`);
+
+  try {
+    const mesa = await Mesa.findByPk(id);
+
+    if (!mesa) {
+      console.warn(`Mesa no encontrada | ID: ${id}`);
+      return res.status(404).json({ error: 'Mesa no encontrada' });
     }
-  };
-  // Función para borrar una mesa
+
+    mesa.capacidad = capacidad ?? mesa.capacidad;
+    mesa.nombre = nombre ?? mesa.nombre;
+    mesa.posx = posx ?? mesa.posx;
+    mesa.posy = posy ?? mesa.posy;
+
+    await mesa.save();
+    console.log(`Mesa actualizada | ID: ${id}`);
+    res.status(200).json(mesa);
+  } catch (error) {
+    console.error(`Error al actualizar la mesa | ID: ${id} | ${error.message}`);
+    res.status(500).json({ error: 'Error al actualizar la mesa' });
+  }
+};
+
+// Eliminar una mesa
 const borrarMesa = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const mesa = await Mesa.findByPk(id); // Busca la mesa por la clave primaria (ID)
-  
-      if (mesa) {
-        await mesa.destroy(); // Elimina la mesa de la base de datos
-        res.status(200).json({ message: 'Mesa eliminada con éxito' });
-      } else {
-        res.status(404).json({ error: 'Mesa no encontrada' });
-      }
-    } catch (error) {
-      console.error('Error al borrar la mesa:', error);
-      res.status(500).json({ error: 'Error al borrar la mesa' });
+  const { id } = req.params;
+  console.log(`[Mesa] Eliminar | ID: ${id}`);
+
+  try {
+    const mesa = await Mesa.findByPk(id);
+
+    if (!mesa) {
+      console.warn(`Mesa no encontrada | ID: ${id}`);
+      return res.status(404).json({ error: 'Mesa no encontrada' });
     }
-  };
-  const actualizarEstadoMesa = async (req, res) => {
-    try {
-      const { id } = req.params; // ID de la mesa
-      const { visible } = req.body; // Estado visible desde el cuerpo de la solicitud
-  
-      // Buscar la mesa por ID
-      const mesa = await Mesa.findByPk(id);
-  
-      if (!mesa) {
-        return res.status(404).json({ error: 'Mesa no encontrada' });
-      }
-  
-      // Actualizar el estado de visibilidad
-      mesa.visible = visible;
-      await mesa.save();
-  
-      res.status(200).json({ message: 'Estado de la mesa actualizado con éxito', mesa });
-    } catch (error) {
-      console.error('Error al actualizar el estado de la mesa:', error);
-      res.status(500).json({ error: 'Error al actualizar el estado de la mesa' });
+
+    await mesa.destroy();
+    console.log(`Mesa eliminada con éxito | ID: ${id}`);
+    res.status(200).json({ message: 'Mesa eliminada con éxito' });
+  } catch (error) {
+    console.error(`Error al eliminar la mesa | ID: ${id} | ${error.message}`);
+    res.status(500).json({ error: 'Error al borrar la mesa' });
+  }
+};
+
+// Cambiar estado visible de una mesa
+const actualizarEstadoMesa = async (req, res) => {
+  const { id } = req.params;
+  const { visible } = req.body;
+  console.log(`[Mesa] Cambiar visibilidad | ID: ${id} → Visible: ${visible}`);
+
+  try {
+    const mesa = await Mesa.findByPk(id);
+
+    if (!mesa) {
+      console.warn(`Mesa no encontrada para actualizar visibilidad | ID: ${id}`);
+      return res.status(404).json({ error: 'Mesa no encontrada' });
     }
-  };
-  
-  
-  
+
+    mesa.visible = visible;
+    await mesa.save();
+
+    console.log(`Visibilidad actualizada | ID: ${id}, Visible: ${visible}`);
+    res.status(200).json({ message: 'Estado de la mesa actualizado con éxito', mesa });
+  } catch (error) {
+    console.error(`Error al actualizar visibilidad | ID: ${id} | ${error.message}`);
+    res.status(500).json({ error: 'Error al actualizar el estado de la mesa' });
+  }
+};
 
 module.exports = {
   obtenerMesa,
@@ -117,5 +131,5 @@ module.exports = {
   actualizarMesa,
   borrarMesa,
   actualizarEstadoMesa,
-  obtenerMesaPorId
+  obtenerMesaPorId,
 };

@@ -3,7 +3,7 @@ const sequelize = require('../../config/db');
 // Crear una nueva calificación
 exports.crearCalificacion = async (req, res) => {
   const { puntuacion, idusuario, idplato } = req.body;
-  console.log('Solicitud recibida para guardar calificación:', req.body);
+  console.log(`Crear calificación | Usuario: ${idusuario}, Plato: ${idplato}, Puntuación: ${puntuacion}`);
 
   try {
     const nuevaCalificacion = await sequelize.query(
@@ -15,18 +15,21 @@ exports.crearCalificacion = async (req, res) => {
       }
     );
 
+    console.log(`Calificación creada con éxito para Usuario ${idusuario}, Plato ${idplato}`);
     res.status(201).json({
       message: 'Calificación creada exitosamente',
       data: nuevaCalificacion[0],
     });
   } catch (error) {
-    console.error('Error al crear la calificación:', error);
+    console.error(`Error al crear calificación | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
     res.status(500).json({ error: 'Error al crear la calificación' });
   }
 };
 
 // Obtener todas las calificaciones
 exports.obtenerCalificaciones = async (req, res) => {
+  console.log('Obtener todas las calificaciones');
+
   try {
     const calificaciones = await sequelize.query(
       `SELECT r.idresenia, r.puntuacion, r.fecha, r.idusuario, r.idplato,
@@ -37,16 +40,19 @@ exports.obtenerCalificaciones = async (req, res) => {
       { type: sequelize.QueryTypes.SELECT }
     );
 
+    console.log(`${calificaciones.length} calificaciones obtenidas`);
     res.json(calificaciones);
   } catch (error) {
-    console.error('Error al obtener las calificaciones:', error);
+    console.error(`Error al obtener calificaciones: ${error.message}`);
     res.status(500).json({ error: 'Error al obtener las calificaciones' });
   }
 };
 
+// Actualizar calificación
 exports.actualizarCalificacion = async (req, res) => {
   const { puntuacion, idusuario, idplato } = req.body;
-  console.log("Datos recibidos:", req.body); 
+  console.log(`Actualizar calificación | Usuario: ${idusuario}, Plato: ${idplato}, Nueva puntuación: ${puntuacion}`);
+
   try {
     const [actualizado] = await sequelize.query(
       `UPDATE resenia
@@ -59,19 +65,22 @@ exports.actualizarCalificacion = async (req, res) => {
     );
 
     if (actualizado) {
+      console.log(`Calificación actualizada | Usuario: ${idusuario}, Plato: ${idplato}`);
       res.json({ message: "Calificación actualizada exitosamente" });
     } else {
+      console.warn(`No se encontró calificación para actualizar | Usuario: ${idusuario}, Plato: ${idplato}`);
       res.status(404).json({ error: "No se encontró la calificación para actualizar" });
     }
   } catch (error) {
-    console.error("Error al actualizar la calificación:", error);
+    console.error(`Error al actualizar calificación | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
     res.status(500).json({ error: "Error al actualizar la calificación" });
   }
 };
 
-// Eliminar una calificación
+// Eliminar calificación
 exports.eliminarCalificacion = async (req, res) => {
   const { id } = req.params;
+  console.log(`Eliminar calificación | ID: ${id}`);
 
   try {
     const eliminado = await sequelize.query(
@@ -83,24 +92,29 @@ exports.eliminarCalificacion = async (req, res) => {
     );
 
     if (eliminado) {
+      console.log(`Calificación eliminada | ID: ${id}`);
       res.status(204).json();
     } else {
+      console.warn(`Calificación no encontrada para eliminar | ID: ${id}`);
       res.status(404).json({ error: 'Calificación no encontrada' });
     }
   } catch (error) {
-    console.error('Error al eliminar la calificación:', error);
+    console.error(`Error al eliminar calificación | ID: ${id} | ${error.message}`);
     res.status(500).json({ error: 'Error al eliminar la calificación' });
   }
 };
 
+// Verificar existencia de reseña
 exports.existeResenia = async (req, res) => {
   const { idusuario, idplato } = req.query;
-  console.log("Parámetros recibidos:", { idusuario, idplato });
+  console.log(`Verificar reseña | Usuario: ${idusuario}, Plato: ${idplato}`);
 
   try {
     if (!idusuario || !idplato) {
+      console.warn(" Faltan parámetros en la verificación de reseña");
       return res.status(400).json({ error: "Faltan parámetros: idusuario o idplato." });
     }
+
     const reseña = await sequelize.query(
       `SELECT * FROM resenia WHERE idusuario = :idusuario AND idplato = :idplato`,
       {
@@ -109,15 +123,18 @@ exports.existeResenia = async (req, res) => {
       }
     );
 
+    console.log(`Verificación completada | Existe: ${reseña.length > 0}`);
     res.json({ existe: reseña.length > 0 });
   } catch (error) {
-    console.error("Error al verificar existencia de la reseña:", error);
+    console.error(`Error al verificar reseña | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
     res.status(500).json({ error: "Error al verificar la reseña" });
   }
 };
 
+// Obtener calificaciones por usuario
 exports.obtenerCalificacionesPorUsuario = async (req, res) => {
   const { idusuario } = req.params;
+  console.log(`Obtener calificaciones del usuario | ID: ${idusuario}`);
 
   try {
     const calificaciones = await sequelize.query(
@@ -135,16 +152,18 @@ exports.obtenerCalificacionesPorUsuario = async (req, res) => {
       }
     );
 
+    console.log(`Calificaciones del usuario ${idusuario} obtenidas: ${calificaciones.length}`);
     res.json(calificaciones);
   } catch (error) {
-    console.error("Error al obtener las calificaciones del usuario:", error);
+    console.error(`Error al obtener calificaciones del usuario ${idusuario}: ${error.message}`);
     res.status(500).json({ error: "Error al obtener las calificaciones del usuario." });
   }
 };
-// Calificar experiencia después de un pedido
+
+
 exports.calificarExperiencia = async (req, res) => {
   const { puntuacion, idusuario, fecha } = req.body;
-  console.log('Solicitud recibida para calificar experiencia:', req.body);
+  console.log(`Calificar experiencia | Usuario: ${idusuario}, Fecha: ${fecha}, Puntuación: ${puntuacion}`);
 
   try {
     const nuevaCalificacion = await sequelize.query(
@@ -156,12 +175,13 @@ exports.calificarExperiencia = async (req, res) => {
       }
     );
 
+    console.log(`Experiencia calificada exitosamente | Usuario: ${idusuario}`);
     res.status(201).json({
       message: 'Experiencia calificada exitosamente',
       data: nuevaCalificacion[0],
     });
   } catch (error) {
-    console.error('Error al calificar la experiencia:', error);
+    console.error(`Error al calificar experiencia | Usuario: ${idusuario} | ${error.message}`);
     res.status(500).json({ error: 'Error al calificar la experiencia' });
   }
 };
