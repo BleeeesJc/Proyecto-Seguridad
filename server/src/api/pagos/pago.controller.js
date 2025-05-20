@@ -3,11 +3,11 @@ const sequelize = require('../../config/db');
 // Controlador: Crear un nuevo pago y actualizar el estado del pedido
 exports.crearPago = async (req, res) => {
     const { idpedido, idusuario, monto } = req.body;
-    const fecha = new Date(); // Fecha actual
+    const fecha = new Date();
+    console.log(`💳 [Pago] Crear | Pedido: ${idpedido}, Usuario: ${idusuario}, Monto: ${monto}, Fecha: ${fecha.toISOString()}`);
 
-    const transaction = await sequelize.transaction(); // Iniciar transacción
+    const transaction = await sequelize.transaction();
     try {
-        // Verificar si el pedido ya fue pagado
         const [pedido] = await sequelize.query(
             `SELECT estado FROM pedido WHERE idpedido = :idpedido`,
             {
@@ -17,14 +17,15 @@ exports.crearPago = async (req, res) => {
         );
 
         if (!pedido) {
+            console.warn(`[Pago] Pedido no encontrado | ID: ${idpedido}`);
             throw new Error('Pedido no encontrado');
         }
 
         if (pedido.estado === 1) {
+            console.warn(`[Pago] Pedido ya pagado | ID: ${idpedido}`);
             throw new Error('El pedido ya ha sido pagado');
         }
 
-        // Insertar el pago
         await sequelize.query(
             `INSERT INTO pago (idpedido, idusuario, monto, fecha)
              VALUES (:idpedido, :idusuario, :monto, :fecha)`,
@@ -34,8 +35,8 @@ exports.crearPago = async (req, res) => {
                 transaction,
             }
         );
+        console.log(`[Pago] Registro de pago insertado | Pedido: ${idpedido}`);
 
-        // Actualizar estado del pedido a pagado (1)
         await sequelize.query(
             `UPDATE pedido SET estado = 1 WHERE idpedido = :idpedido`,
             {
@@ -44,18 +45,21 @@ exports.crearPago = async (req, res) => {
                 transaction,
             }
         );
+        console.log(`[Pago] Estado de pedido actualizado a PAGADO | Pedido: ${idpedido}`);
 
-        await transaction.commit(); // Confirmar transacción
+        await transaction.commit();
+        console.log(`[Pago] Transacción completada | Pedido: ${idpedido}`);
         res.status(201).json({ message: 'Pago creado y pedido actualizado exitosamente' });
     } catch (error) {
-        await transaction.rollback(); // Revertir transacción en caso de error
-        console.error("Error al crear el pago o actualizar el pedido:", error);
+        await transaction.rollback();
+        console.error(`[Pago] Error en crearPago | Pedido: ${idpedido} | ${error.message}`);
         res.status(500).json({ error: error.message });
     }
 };
 
 // Obtener todos los pagos
 exports.obtenerPagos = async (req, res) => {
+    console.log('[Pago] Obtener todos los pagos');
     try {
         const pagos = await sequelize.query(
             `SELECT p.idpago, p.monto, p.fecha, p.idpedido, p.idusuario, 
@@ -65,10 +69,10 @@ exports.obtenerPagos = async (req, res) => {
              JOIN pedido ped ON p.idpedido = ped.idpedido`,
             { type: sequelize.QueryTypes.SELECT }
         );
-
+        console.log(`[Pago] Pagos obtenidos: ${pagos.length}`);
         res.json(pagos);
     } catch (error) {
-        console.error("Error al obtener los pagos:", error);
+        console.error(`[Pago] Error al obtener los pagos | ${error.message}`);
         res.status(500).json({ error: 'Error al obtener los pagos' });
     }
 };
@@ -77,6 +81,7 @@ exports.obtenerPagos = async (req, res) => {
 exports.actualizarPago = async (req, res) => {
     const { id } = req.params;
     const { idpedido, idusuario, monto, fecha } = req.body;
+    console.log(`[Pago] Actualizar | Pago ID: ${id}, Pedido: ${idpedido}, Usuario: ${idusuario}, Monto: ${monto}`);
 
     try {
         const [actualizado] = await sequelize.query(
@@ -90,12 +95,14 @@ exports.actualizarPago = async (req, res) => {
         );
 
         if (actualizado) {
+            console.log(`[Pago] Pago actualizado | Pago ID: ${id}`);
             res.json({ message: 'Pago actualizado exitosamente' });
         } else {
+            console.warn(`⚠️ [Pago] Pago no encontrado para actualizar | Pago ID: ${id}`);
             res.status(404).json({ error: 'Pago no encontrado' });
         }
     } catch (error) {
-        console.error("Error al actualizar el pago:", error);
+        console.error(`[Pago] Error al actualizar el pago | Pago ID: ${id} | ${error.message}`);
         res.status(500).json({ error: 'Error al actualizar el pago' });
     }
 };
@@ -103,6 +110,7 @@ exports.actualizarPago = async (req, res) => {
 // Eliminar un pago
 exports.eliminarPago = async (req, res) => {
     const { id } = req.params;
+    console.log(`🗑️ [Pago] Eliminar | Pago ID: ${id}`);
 
     try {
         const eliminado = await sequelize.query(
@@ -111,12 +119,14 @@ exports.eliminarPago = async (req, res) => {
         );
 
         if (eliminado) {
+            console.log(`[Pago] Pago eliminado | Pago ID: ${id}`);
             res.status(204).json();
         } else {
+            console.warn(`[Pago] Pago no encontrado para eliminar | Pago ID: ${id}`);
             res.status(404).json({ error: 'Pago no encontrado' });
         }
     } catch (error) {
-        console.error("Error al eliminar el pago:", error);
+        console.error(`[Pago] Error al eliminar el pago | Pago ID: ${id} | ${error.message}`);
         res.status(500).json({ error: 'Error al eliminar el pago' });
     }
 };

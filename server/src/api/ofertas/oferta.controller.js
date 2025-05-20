@@ -18,6 +18,7 @@ exports.crearOferta = async (req, res) => {
 
         // Valida los datos requeridos
         if (!titulo || !requerimiento || !descripcion || !fecha_inicio || !fecha_fin || !descuento || !idPlato || !src) {
+            console.warn('[Oferta] Datos incompletos en creación');
             return res.status(400).json({ error: "Todos los campos son requeridos." });
         }
 
@@ -30,12 +31,13 @@ exports.crearOferta = async (req, res) => {
                 type: sequelize.QueryTypes.INSERT,
             }
         );
-
+        console.log('[Oferta] Registro insertado en BD');
         // Obtener todos los usuarios con rol 1
         const usuarios = await sequelize.query(
             `SELECT correo FROM usuario WHERE idRol = 1`,
             { type: sequelize.QueryTypes.SELECT }
         );
+        console.log(`[Oferta] Enviando correos a ${usuarios.length} usuarios con rol 1`);
         const emailPromises = usuarios.map(usuario => {
             const mailOptions = {
                 from: process.env.EMAIL_USER,
@@ -60,10 +62,10 @@ exports.crearOferta = async (req, res) => {
 
         // Esperar que todos los correos sean enviados
         await Promise.all(emailPromises);
-
+        console.log('[Oferta] Correos enviados correctamente');
         res.status(201).json({ message: "Oferta creada y correos enviados a los usuarios con rol 1." });
     } catch (error) {
-        console.error("Error al crear la oferta o enviar correos:", error);
+        console.error(`[Oferta] Error en creación o envío de correos | ${error.message}`);
         res.status(500).json({ error: "Error al crear la oferta o enviar correos", details: error.message });
     }
 };
@@ -75,9 +77,10 @@ exports.obtenerOfertas = async (req, res) => {
             `SELECT * FROM oferta`,
             { type: sequelize.QueryTypes.SELECT }
         );
+        console.log(`[Oferta] Ofertas obtenidas: ${ofertas.length}`);
         res.json(ofertas);
     } catch (error) {
-        console.error("Error al obtener las ofertas:", error);
+        console.error(`[Oferta] Error al obtener las ofertas | ${error.message}`);
         res.status(500).json({ error: 'Error al obtener las ofertas' });
     }
 };
@@ -90,7 +93,7 @@ exports.actualizarOferta = async (req, res) => {
 
         // Usa la nueva imagen si se proporciona
         const src = req.file ? req.file.path : null;
-
+        console.log(`[Oferta] Actualizar | ID: ${id}, Título: "${titulo}", Descuento: ${descuento}%`);
         if (!titulo || !requerimiento || !descripcion || !fecha_inicio || !fecha_fin || !descuento || !idPlato) {
             return res.status(400).json({ error: "Todos los campos son requeridos." });
         }
@@ -108,6 +111,7 @@ exports.actualizarOferta = async (req, res) => {
                      WHERE idOferta = :id`;
 
         if (src) {
+            console.log(`[Oferta] Imagen actualizada | Ruta: ${src}`);
             query = `UPDATE oferta SET 
                         src = :src,
                         titulo = :titulo,
@@ -124,16 +128,17 @@ exports.actualizarOferta = async (req, res) => {
         const [actualizado] = await sequelize.query(query, { replacements, type: sequelize.QueryTypes.UPDATE });
 
         if (!actualizado) {
+            console.warn(`[Oferta] No se encontró oferta con ID: ${id}`);
             return res.status(404).json({ error: "Oferta no encontrada." });
         }
-
+        console.log(`[Oferta] Registro actualizado | ID: ${id}`);
         // Envía correos si es necesario (maneja errores dentro de esta lógica)
         try {
             const usuarios = await sequelize.query(
                 `SELECT correo FROM usuario WHERE idRol = 1`,
                 { type: sequelize.QueryTypes.SELECT }
             );
-
+            console.log(`[Oferta] Reenvío de correos a ${usuarios.length} usuarios`);
             const emailPromises = usuarios.map(usuario => {
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
@@ -157,15 +162,15 @@ exports.actualizarOferta = async (req, res) => {
             });
 
             await Promise.all(emailPromises);
+            console.log('[Oferta] Correos de actualización enviados');
         } catch (error) {
-            console.error("Error al enviar correos:", error);
-            // Aquí no deberías llamar a res.json de nuevo; solo registra el error
+            console.error(`[Oferta] Error al enviar correos de actualización | ${mailError.message}`);
         }
 
         // Envía respuesta de éxito
         return res.json({ message: "Oferta actualizada correctamente y correos enviados." });
     } catch (error) {
-        console.error("Error al actualizar la oferta:", error);
+        cconsole.error(`[Oferta] Error al actualizar la oferta | ${error.message}`);
         return res.status(500).json({ error: "Error interno del servidor" });
     }
 };
@@ -174,7 +179,7 @@ exports.actualizarOferta = async (req, res) => {
 // Eliminar una oferta
 exports.eliminarOferta = async (req, res) => {
     const { id } = req.params;
-
+    console.log(`[Oferta] Eliminar | ID: ${id}`);
     try {
         const eliminado = await sequelize.query(
             `DELETE FROM oferta WHERE idOferta = :id`,
@@ -185,11 +190,14 @@ exports.eliminarOferta = async (req, res) => {
         );
 
         if (eliminado) {
-            res.status(204).json();
+            console.log(`[Oferta] Oferta eliminada | ID: ${id}`);
+            return res.status(204).json();
         } else {
-            res.status(404).json({ error: 'Oferta no encontrada' });
+            console.warn(`[Oferta] No se encontró oferta para eliminar | ID: ${id}`);
+            return res.status(404).json({ error: 'Oferta no encontrada' });
         }
     } catch (error) {
+        console.error(`[Oferta] Error al eliminar la oferta | ${error.message}`);
         res.status(500).json({ error: 'Error al eliminar la oferta' });
     }
 };  

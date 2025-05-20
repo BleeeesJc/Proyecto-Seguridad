@@ -1,9 +1,9 @@
-//src/api/detalle_pedido/detalle_pedido.controller.js
 const sequelize = require('../../config/db');
 
 // Crear un nuevo detalle de pedido
 exports.crearDetallePedido = async (req, res) => {
     const { cantidad, idplato, idpedido, idreserva } = req.body;
+    console.log(`[DetallePedido] Crear | Plato: ${idplato}, Pedido: ${idpedido}, Reserva: ${idreserva}, Cantidad: ${cantidad}`);
 
     try {
         await sequelize.query(
@@ -15,15 +15,18 @@ exports.crearDetallePedido = async (req, res) => {
             }
         );
 
+        console.log(`Detalle de pedido creado con éxito | Pedido ID: ${idpedido}`);
         res.status(201).json({ message: 'Detalle de pedido creado exitosamente' });
     } catch (error) {
-        console.error("Error al crear el detalle del pedido:", error);
-        res.status(500).json({ error: 'Error al crear el detalle del pedido' });
+        console.error(`Error al crear detalle del pedido | ${error.message}`);
+        res.status(500).json({ error: 'Error al crear el detalle del pedido', details: error.message });
     }
 };
 
 // Obtener todos los detalles de pedido
 exports.obtenerDetallesPedido = async (req, res) => {
+    console.log(`📦 [DetallePedido] Obtener todos`);
+
     try {
         const detalles = await sequelize.query(
             `SELECT dp.iddetalle, dp.cantidad, dp.idplato, dp.idpedido, dp.idreserva, 
@@ -34,9 +37,10 @@ exports.obtenerDetallesPedido = async (req, res) => {
             { type: sequelize.QueryTypes.SELECT }
         );
 
+        console.log(`Detalles de pedido obtenidos (${detalles.length} registros)`);
         res.json(detalles);
     } catch (error) {
-        console.error("Error al obtener los detalles de pedido:", error);
+        console.error(`Error al obtener detalles de pedido | ${error.message}`);
         res.status(500).json({ error: 'Error al obtener los detalles de pedido' });
     }
 };
@@ -45,6 +49,7 @@ exports.obtenerDetallesPedido = async (req, res) => {
 exports.actualizarDetallePedido = async (req, res) => {
     const { id } = req.params;
     const { cantidad, idplato, idpedido, idreserva } = req.body;
+    console.log(`🔧 [DetallePedido] Actualizar | ID: ${id}`);
 
     try {
         const [actualizado] = await sequelize.query(
@@ -58,12 +63,14 @@ exports.actualizarDetallePedido = async (req, res) => {
         );
 
         if (actualizado) {
+            console.log(`Detalle de pedido actualizado | ID: ${id}`);
             res.json({ message: 'Detalle de pedido actualizado exitosamente' });
         } else {
+            console.warn(`Detalle de pedido no encontrado | ID: ${id}`);
             res.status(404).json({ error: 'Detalle de pedido no encontrado' });
         }
     } catch (error) {
-        console.error("Error al actualizar el detalle del pedido:", error);
+        console.error(`❌ Error al actualizar detalle del pedido | ID: ${id} | ${error.message}`);
         res.status(500).json({ error: 'Error al actualizar el detalle del pedido' });
     }
 };
@@ -71,6 +78,7 @@ exports.actualizarDetallePedido = async (req, res) => {
 // Eliminar un detalle de pedido
 exports.eliminarDetallePedido = async (req, res) => {
     const { id } = req.params;
+    console.log(`[DetallePedido] Eliminar | ID: ${id}`);
 
     try {
         const eliminado = await sequelize.query(
@@ -79,22 +87,28 @@ exports.eliminarDetallePedido = async (req, res) => {
         );
 
         if (eliminado) {
+            console.log(`Detalle de pedido eliminado | ID: ${id}`);
             res.status(204).json();
         } else {
+            console.warn(`⚠️ Detalle de pedido no encontrado para eliminar | ID: ${id}`);
             res.status(404).json({ error: 'Detalle de pedido no encontrado' });
         }
     } catch (error) {
-        console.error("Error al eliminar el detalle del pedido:", error);
+        console.error(`Error al eliminar detalle del pedido | ID: ${id} | ${error.message}`);
         res.status(500).json({ error: 'Error al eliminar el detalle del pedido' });
     }
 };
 
+// Obtener detalles por ID de pedido
 exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
-    const { pedido } = req.query; // Leer el idPedido de los parámetros de consulta
+    const { pedido } = req.query;
 
     if (!pedido) {
+        console.warn('Falta parámetro obligatorio "pedido"');
         return res.status(400).json({ error: 'El parámetro "pedido" es obligatorio.' });
     }
+
+    console.log(`[DetallePedido] Obtener por pedido | Pedido ID: ${pedido}`);
 
     try {
         const detalles = await sequelize.query(
@@ -103,16 +117,17 @@ exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
              FROM detalle_pedido dp
              JOIN platillo pl ON dp.idplato = pl.idplato
              LEFT JOIN reserva r ON dp.idreserva = r.idreserva
-             WHERE dp.idpedido = :pedido`, // Filtrar por idPedido
-            { 
-                replacements: { pedido }, // Reemplazar el valor en la consulta
-                type: sequelize.QueryTypes.SELECT 
+             WHERE dp.idpedido = :pedido`,
+            {
+                replacements: { pedido },
+                type: sequelize.QueryTypes.SELECT
             }
         );
 
+        console.log(`Detalles por pedido obtenidos | Pedido ID: ${pedido} | Registros: ${detalles.length}`);
         res.json(detalles);
     } catch (error) {
-        console.error("Error al obtener los detalles del pedido:", error);
+        console.error(`Error al obtener detalles del pedido | Pedido ID: ${pedido} | ${error.message}`);
         res.status(500).json({ error: 'Error al obtener los detalles del pedido' });
     }
 };
