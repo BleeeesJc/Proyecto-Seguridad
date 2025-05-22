@@ -65,8 +65,7 @@ exports.crearOferta = async (req, res) => {
         console.log('[Oferta] Correos enviados correctamente');
         res.status(201).json({ message: "Oferta creada y correos enviados a los usuarios con rol 1." });
     } catch (error) {
-        console.error(`[Oferta] Error en creación o envío de correos | ${error.message}`);
-        res.status(500).json({ error: "Error al crear la oferta o enviar correos", details: error.message });
+        next(error);
     }
 };
 
@@ -80,8 +79,7 @@ exports.obtenerOfertas = async (req, res) => {
         console.log(`[Oferta] Ofertas obtenidas: ${ofertas.length}`);
         res.json(ofertas);
     } catch (error) {
-        console.error(`[Oferta] Error al obtener las ofertas | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener las ofertas' });
+        next(error);
     }
 };
 
@@ -164,14 +162,13 @@ exports.actualizarOferta = async (req, res) => {
             await Promise.all(emailPromises);
             console.log('[Oferta] Correos de actualización enviados');
         } catch (error) {
-            console.error(`[Oferta] Error al enviar correos de actualización | ${mailError.message}`);
+            next(error);
         }
 
         // Envía respuesta de éxito
         return res.json({ message: "Oferta actualizada correctamente y correos enviados." });
     } catch (error) {
-        cconsole.error(`[Oferta] Error al actualizar la oferta | ${error.message}`);
-        return res.status(500).json({ error: "Error interno del servidor" });
+        next(error);
     }
 };
 

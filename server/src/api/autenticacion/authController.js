@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Usuario = require('../usuario/usuario.model');
-const Rol = require('../rol/rol.model'); 
+const Rol = require('../rol/rol.model');
 
 const axios = require('axios');
 
 console.log("se carga el authcontroller")
 
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const { correo, password } = req.body;
   console.log('[Auth] Intento de login | correo:', req.body.correo);
   try {
@@ -34,7 +34,7 @@ const login = async (req, res) => {
           'mapacliente',
           'menucliente'
         ]
-        
+
       }
     });
 
@@ -55,7 +55,7 @@ const login = async (req, res) => {
       correo: user.correo,
       rol: user.rol.rol // solo el nombre del rol en el JWT
     };
-    
+
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     console.log(`[Auth] Token generado | usuario: ${user.idusuario}`);
 
@@ -66,7 +66,7 @@ const login = async (req, res) => {
       rol: user.rol.get({ plain: true }), // Muestra la matriz de permisos
       token
     });
-    
+
 
     // Responde con los permisos completos
     res.status(200).json({
@@ -79,13 +79,13 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    cconsole.error(`[Auth] Error en el login | ${error.message}`);
-    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    console.error('[Auth] Error en el proceso de login:', error);
+    next(error);
   }
 };
 
 // Obtener todos los usuarios registrados
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
   try {
     // Obtener todos los usuarios
     const users = await User.findAll();
@@ -98,8 +98,7 @@ const getAllUsers = async (req, res) => {
     // Responde con los usuarios encontrados
     res.status(200).json({ users });
   } catch (error) {
-    console.error(`[Auth] Error al obtener usuarios | ${error.message}`);
-    res.status(500).json({ message: 'Error en el servidor', error: error.message });
+    next(error);
   }
 };
 

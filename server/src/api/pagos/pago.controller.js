@@ -52,8 +52,7 @@ exports.crearPago = async (req, res) => {
         res.status(201).json({ message: 'Pago creado y pedido actualizado exitosamente' });
     } catch (error) {
         await transaction.rollback();
-        console.error(`[Pago] Error en crearPago | Pedido: ${idpedido} | ${error.message}`);
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
@@ -72,8 +71,7 @@ exports.obtenerPagos = async (req, res) => {
         console.log(`[Pago] Pagos obtenidos: ${pagos.length}`);
         res.json(pagos);
     } catch (error) {
-        console.error(`[Pago] Error al obtener los pagos | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener los pagos' });
+        next(error);
     }
 };
 
@@ -102,8 +100,7 @@ exports.actualizarPago = async (req, res) => {
             res.status(404).json({ error: 'Pago no encontrado' });
         }
     } catch (error) {
-        console.error(`[Pago] Error al actualizar el pago | Pago ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al actualizar el pago' });
+        next(error);
     }
 };
 
@@ -126,7 +123,6 @@ exports.eliminarPago = async (req, res) => {
             res.status(404).json({ error: 'Pago no encontrado' });
         }
     } catch (error) {
-        console.error(`[Pago] Error al eliminar el pago | Pago ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar el pago' });
+        next(error);
     }
 };

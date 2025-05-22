@@ -3,8 +3,7 @@ const sequelize = require('../../config/db');
 const emailExistence = require('email-existence');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-const HistoricoContrasenas = require('../historico_contrasenas/historico_contrasenas.model'); // Importar el modelo
-
+const HistoricoContrasenas = require('../historico_contrasenas/historico_contrasenas.model');
 
 const verificationCodes = {}; // temporal
 
@@ -59,8 +58,7 @@ exports.registrarUsuario = async (req, res) => {
     console.log(`[Usuario] Registrado exitosamente | rol: ${rolId}`);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
-    console.error(`[Usuario] Error al registrar | ${error.message}`);
-    res.status(500).json({ message: 'Error al registrar el usuario', error: error.message });
+    next(error);
   }
 };
 
@@ -82,8 +80,7 @@ exports.actualizarRolUsuario = async (req, res) => {
     console.log(`[Usuario] Rol actualizado | idUsuario: ${id}`);
     res.json({ message: 'Rol del usuario actualizado exitosamente' });
   } catch (error) {
-    console.error(`[Usuario] Error al actualizar rol | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar el rol del usuario' });
+    next(error);
   }
 };
 
@@ -95,8 +92,7 @@ exports.obtenerUsuarios = async (req, res) => {
     console.log(`[Usuario] Usuarios obtenidos: ${usuarios.length}`);
     res.json(usuarios);
   } catch (error) {
-    console.error(`[Usuario] Error al obtener usuarios | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener los usuarios' });
+    next(error);
   }
 };
 
@@ -112,8 +108,7 @@ exports.obtenerUsuariosPorRol = async (req, res) => {
     console.log(`[Usuario] Usuarios con rol "${rol}": ${usuarios.length}`);
     res.json(usuarios);
   } catch (error) {
-    console.error(`[Usuario] Error al obtener usuarios por rol | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener usuarios por rol' });
+    next(error);
   }
 };
 
@@ -139,8 +134,7 @@ exports.obtenerUsuarioPorId = async (req, res) => {
       res.status(404).json({ error: 'Usuario no encontrado' });
     }
   } catch (error) {
-    console.error(`[Usuario] Error al obtener usuario | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener el usuario' });
+    next(error);
   }
 };
 
@@ -168,8 +162,7 @@ exports.actualizarUsuario = async (req, res) => {
       res.status(404).json({ error: 'Usuario no encontrado' });
     }
   } catch (error) {
-    console.error(`[Usuario] Error al actualizar usuario | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar el usuario' });
+    next(error);
   }
 };
 
@@ -189,15 +182,14 @@ exports.obtenerUsuarioPorCorreo = async (req, res) => {
     console.log(`[Usuario] Encontrado por correo | ${correo}`);
     res.json(usuario[0]);
   } catch (error) {
-    console.error(`[Usuario] Error al obtener por correo | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener el usuario por correo' });
+    next(error);
   }
 };
 
 // Actualizar contraseña con validación de histórico
 exports.actualizarContrasena = async (req, res) => {
-  const { id } = req.params; 
-  const { newPassword } = req.body; 
+  const { id } = req.params;
+  const { newPassword } = req.body;
 
   console.log(`[Usuario] Actualizar contraseña | idUsuario: ${id}`);
 
@@ -250,8 +242,7 @@ exports.actualizarContrasena = async (req, res) => {
     console.log('[Usuario] Contraseña actualizada');
     res.json({ message: 'Contraseña actualizada exitosamente' });
   } catch (error) {
-    console.error(`[Usuario] Error al actualizar contraseña | ${error.message}`);
-    res.status(500).json({ message: 'Error al actualizar la contraseña', error: error.message });
+    next(error);
   }
 };
 
@@ -272,8 +263,7 @@ exports.eliminarUsuario = async (req, res) => {
     console.log(`[Usuario] Usuario eliminado | idUsuario: ${id}`);
     res.status(204).json();
   } catch (error) {
-    console.error(`[Usuario] Error al eliminar usuario | ${error.message}`);
-    res.status(500).json({ error: 'Error al eliminar el usuario' });
+    next(error);
   }
 };
 
@@ -312,8 +302,7 @@ exports.autenticarUsuario = async (req, res) => {
       user: { id: usuario.idusuario, email: usuario.correo, rol: usuario.idrol }
     });
   } catch (error) {
-    console.error(`[Auth] Error al autenticar | ${error.message}`);
-    res.status(500).json({ success: false, message: 'Error al autenticar al usuario' });
+    next(error);
   }
 };
 
@@ -341,7 +330,7 @@ exports.enviarCodigo = (req, res) => {
     }
 
     try {
-    
+
       const verificationCode = Math.floor(100000 + Math.random() * 900000);
       verificationCodes[email] = verificationCode;
       console.log(`[Auth] Código generado | ${verificationCode}`);
@@ -356,8 +345,7 @@ exports.enviarCodigo = (req, res) => {
       console.log(`[Auth] Código enviado por email | email: ${email}`);
       res.json({ success: true, message: 'Código de verificación enviado.' });
     } catch (error) {
-      console.error(`[Auth] Error al enviar correo | ${error.message}`);
-      res.status(500).json({ success: false, message: 'Error interno al enviar el código.' });
+      next(error);
     }
   });
 };
@@ -427,8 +415,7 @@ exports.enviarConfirmacionPedido = async (req, res) => {
     console.log(`[Pedido] Confirmación enviada | email: ${email}`);
     res.json({ success: true, message: 'Correo de confirmación enviado' });
   } catch (error) {
-    console.error(`[Pedido] Error al enviar confirmación | ${error.message}`);
-    res.status(500).json({ success: false, message: 'Error al enviar el correo', error: error.message });
+    next(error);
   }
 };
 
@@ -445,8 +432,7 @@ exports.verificarCodigo = async (req, res) => {
       res.status(400).json({ success: false, message: 'Código de verificación incorrecto' });
     }
   } catch (error) {
-    console.error(`[Auth] Error al verificar código | ${error.message}`);
-    res.status(500).json({ success: false, message: 'Error al verificar el código', error: error.message });
+    next(error);
   }
 };
 
@@ -487,8 +473,7 @@ exports.enviarReserva = async (req, res) => {
     console.log(`[Reserva] Confirmación enviada | email: ${email}`);
     res.json({ success: true, message: 'Correo de confirmación enviado' });
   } catch (error) {
-    console.error(`[Reserva] Error al enviar confirmación | ${error.message}`);
-    res.status(500).json({ success: false, message: 'Error al enviar la confirmación de reserva', error: error.message });
+    next(error);
   }
 };
 

@@ -18,8 +18,7 @@ exports.crearCategoria = async (req, res) => {
         console.log(`Categoría creada exitosamente | Tipo: ${tipo}`);
         res.status(201).json({ message: 'Categoría creada exitosamente' });
     } catch (error) {
-        console.error(`Error al crear la categoría | Tipo: ${tipo} | ${error.message}`);
-        res.status(500).json({ error: 'Error al crear la categoría', details: error.message });
+        next(error);
     }
 };
 
@@ -36,8 +35,7 @@ exports.obtenerCategorias = async (req, res) => {
         console.log(`Categorías obtenidas: ${categorias.length}`);
         res.json(categorias);
     } catch (error) {
-        console.error(`Error al obtener las categorías: ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener las categorías' });
+        next(error);
     }
 };
 
@@ -66,8 +64,7 @@ exports.actualizarCategoria = async (req, res) => {
             res.status(404).json({ error: 'Categoría no encontrada' });
         }
     } catch (error) {
-        console.error(`Error al actualizar la categoría | ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al actualizar la categoría' });
+        next(error);
     }
 };
 
@@ -93,7 +90,6 @@ exports.eliminarCategoria = async (req, res) => {
             res.status(404).json({ error: 'Categoría no encontrada' });
         }
     } catch (error) {
-        console.error(`Error al eliminar la categoría | ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar la categoría' });
+        next(error);
     }
 };

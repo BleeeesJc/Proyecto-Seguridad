@@ -1,53 +1,50 @@
 <template>
-    <div class="login-container">
-      <div class="login-card">
-        <h2 class="title">Bienvenido</h2>
-        <form @submit.prevent="changePassword">
-          <label for="password">Nueva contraseña:</label>
-          <div class="password-container">
-            <input
-              :type="showPassword ? 'text' : 'password'"
-              id="password"
-              v-model="password"
-              required
-              placeholder="Ingresa tu contraseña"
-            />
-            <span @click="togglePasswordVisibility" class="toggle-password">
-              <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-            </span>
-          </div>
-  
-          <p class="signup-text">¿Ya tienes una cuenta? <router-link to="/iniciarsesion">Inicia sesión aquí</router-link></p>
-  
-          <button type="submit" class="login-button">Listo</button>
-        </form>
-  
-        <!-- Modal para ingresar el código de verificación -->
-        <div v-if="showVerificationModal" class="modal">
-          <div class="modal-content">
-            <h3>Verifica tu correo</h3>
-            <p>Ingresa el código que enviamos a {{ email }}.</p>
-            <input type="text" v-model="verificationCode" placeholder="Código de verificación" />
-            <button @click="verifyCode" class="login-button">Verificar</button>
-            <button @click="closeModal" class="cancel-button">Cancelar</button>
-          </div>
+  <div class="login-container">
+    <div class="login-card">
+      <h2 class="title">Bienvenido</h2>
+      <form @submit.prevent="changePassword">
+        <label for="password">Nueva contraseña:</label>
+        <div class="password-container">
+          <input :type="showPassword ? 'text' : 'password'" id="password" v-model="password" required
+            placeholder="Ingresa tu contraseña" />
+          <span @click="togglePasswordVisibility" class="toggle-password">
+            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </span>
         </div>
-  
-        <!-- Modal de error -->
-        <div v-if="showErrorModal" class="modal">
-          <div class="modal-content">
-            <h3>Error en el registro</h3>
-            <p>{{ errorMessage }}</p>
-            <button @click="closeModal" class="cancel-button">Intentar de nuevo</button>
-          </div>
+
+        <p class="signup-text">¿Ya tienes una cuenta? <router-link to="/iniciarsesion">Inicia sesión aquí</router-link>
+        </p>
+
+        <button type="submit" class="login-button">Listo</button>
+      </form>
+
+      <!-- Modal para ingresar el código de verificación -->
+      <div v-if="showVerificationModal" class="modal">
+        <div class="modal-content">
+          <h3>Verifica tu correo</h3>
+          <p>Ingresa el código que enviamos a {{ email }}.</p>
+          <input type="text" v-model="verificationCode" placeholder="Código de verificación" />
+          <button @click="verifyCode" class="login-button">Verificar</button>
+          <button @click="closeModal" class="cancel-button">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Modal de error -->
+      <div v-if="showErrorModal" class="modal">
+        <div class="modal-content">
+          <h3>Error en el registro</h3>
+          <p>{{ errorMessage }}</p>
+          <button @click="closeModal" class="cancel-button">Intentar de nuevo</button>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default {
   name: 'RegistroUsuario',
@@ -64,187 +61,193 @@ export default {
     async changePassword() {
       const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{12,}$/;
 
-  if (!passwordRegex.test(this.password)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Contraseña inválida',
-      text: 'La contraseña debe tener al menos 12 caracteres, una letra mayúscula, un número y un carácter especial.',
-    });
-    return;
-  }
+      if (!passwordRegex.test(this.password)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Contraseña inválida',
+          text: 'La contraseña debe tener al menos 12 caracteres, una letra mayúscula, un número y un carácter especial.',
+        });
+        return;
+      }
 
-  // Detectar secuencias numéricas simples como 123, 4567, 0000, 1111, etc.
-  function tieneSecuenciaNumerica(password) {
-    const secuenciaRegex = /(012|123|234|345|456|567|678|789|000|111|222|333|444|555|666|777|888|999)/;
-    return secuenciaRegex.test(password);
-  }
+      // Detectar secuencias numéricas simples como 123, 4567, 0000, 1111, etc.
+      function tieneSecuenciaNumerica(password) {
+        const secuenciaRegex = /(012|123|234|345|456|567|678|789|000|111|222|333|444|555|666|777|888|999)/;
+        return secuenciaRegex.test(password);
+      }
 
-  if (tieneSecuenciaNumerica(this.password)) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Contraseña insegura',
-    text: 'No uses secuencias numéricas obvias como "123", "000" o "111".',
-  });
-  return;
-}
+      if (tieneSecuenciaNumerica(this.password)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Contraseña insegura',
+          text: 'No uses secuencias numéricas obvias como "123", "000" o "111".',
+        });
+        return;
+      }
 
 
-  try {
-    const userId = this.$route.params.id; 
-    const response = await axios.put(`/api/usuario/actualizar-contrasena/${userId}`, {
-      newPassword: this.password,
-    });
+      try {
+        const userId = this.$route.params.id;
+        const response = await axios.put(`/api/usuario/actualizar-contrasena/${userId}`, {
+          newPassword: this.password,
+        });
 
-    if (response.data.message) {
-      Swal.fire({
-        icon: 'success',
-        title: '¡Contraseña actualizada!',
-        text: 'Tu contraseña ha sido cambiada con éxito.',
-      });
-      this.$router.push('/iniciarsesion');
-    }
+        if (response.data.message) {
+          Swal.fire({
+            icon: 'success',
+            title: '¡Contraseña actualizada!',
+            text: 'Tu contraseña ha sido cambiada con éxito.',
+          });
+          this.$router.push('/iniciarsesion');
+        }
 
-  } catch (error) {
-    console.error('Error al actualizar la contraseña:', error);
+      } catch (error) {
+        console.error('Error al actualizar la contraseña:', error);
 
-    // Si hay error personalizado del backend
-    if (error.response && error.response.data && error.response.data.message) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.response.data.message,  // Aquí se usa el mensaje que manda el backend
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Hubo un error al actualizar la contraseña.',
-      });
-    }
-  }
-},
+        // Si hay error personalizado del backend
+        if (error.response && error.response.data && error.response.data.message) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.response.data.message,  // Aquí se usa el mensaje que manda el backend
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al actualizar la contraseña.',
+          });
+        }
+      }
+    },
 
   },
 };
 </script>
-  
-  <style scoped>
-  /* Estilos del modal */
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 4px;
-    width: 300px;
-    text-align: center;
-  }
-  
-  .cancel-button {
-    background-color: #ccc;
-    color: #333;
-    padding: 0.75rem;
-    margin-top: 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .cancel-button:hover {
-    background-color: #aaa;
-  }
-  .password-container {
-    position: relative;
-  }
-  
-  .toggle-password {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #666;
-  }
-  .login-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: #FFFEDC; /* Color de fondo */
-      }
-      
-      .login-card {
-        width: 65%;
-        padding: 2rem;
-        background: white;
-        border-radius: 3vh;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
-      
-      .title {
-        color: #FE9900; /* Color naranja */
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 1.5rem;
-      }
-      
-      label {
-        display: block;
-        text-align: left;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-        color: #444;
-      }
-      
-      input {
-        width: 100%;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
-      }
-      
-      .signup-text {
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 1rem;
-      }
-      
-      .signup-text a {
-        color: #FE9900; /* Color naranja */
-        text-decoration: none;
-      }
-      
-      .signup-text a:hover {
-        text-decoration: underline;
-      }
-      
-      .login-button {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #A16F23; /* Color marrón */
-        color: white;
-        font-size: 1rem;
-        border: none;
-        border-radius: 1.5vh;
-        cursor: pointer;
-        font-weight: bold;
-      }
-      
-      .login-button:hover {
-        background-color: #A16F23; /* Color marrón más oscuro */
-      }
-  </style>
-  
+
+<style scoped>
+/* Estilos del modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 4px;
+  width: 300px;
+  text-align: center;
+}
+
+.cancel-button {
+  background-color: #ccc;
+  color: #333;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #aaa;
+}
+
+.password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #FFFEDC;
+  /* Color de fondo */
+}
+
+.login-card {
+  width: 65%;
+  padding: 2rem;
+  background: white;
+  border-radius: 3vh;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.title {
+  color: #FE9900;
+  /* Color naranja */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #444;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.signup-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.signup-text a {
+  color: #FE9900;
+  /* Color naranja */
+  text-decoration: none;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #A16F23;
+  /* Color marrón */
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 1.5vh;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-button:hover {
+  background-color: #A16F23;
+  /* Color marrón más oscuro */
+}
+</style>

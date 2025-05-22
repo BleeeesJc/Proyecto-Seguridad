@@ -72,13 +72,12 @@ exports.crearReserva = async (req, res) => {
         await transporter.sendMail(mailOptions);
         console.log(`[Reserva] Correo enviado a ${usuario.correo}`);
         // Responder con éxito
-        res.status(201).json({ 
-            message: 'Reserva creada y correo enviado exitosamente', 
-            data: nuevaReserva 
+        res.status(201).json({
+            message: 'Reserva creada y correo enviado exitosamente',
+            data: nuevaReserva
         });
     } catch (error) {
-        console.error(`[Reserva] Error al crear la reserva | ${error.message}`);
-        res.status(500).json({ error: 'Error al crear la reserva' });
+        next(error);
     }
 };
 
@@ -95,8 +94,7 @@ exports.obtenerReservas = async (req, res) => {
         console.log(`[Reserva] Reservas obtenidas: ${reservas.length}`);
         res.json(reservas);
     } catch (error) {
-        console.error(`[Reserva] Error al obtener las reservas | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener las reservas' });
+        next(error);
     }
 };
 
@@ -128,8 +126,7 @@ exports.actualizarReserva = async (req, res) => {
             res.status(404).json({ error: 'Reserva no encontrada' });
         }
     } catch (error) {
-        cconsole.error(`[Reserva] Error al actualizar la reserva | ${error.message}`);
-        res.status(500).json({ error: 'Error al actualizar la reserva' });
+        next(error);
     }
 };
 
@@ -155,8 +152,7 @@ exports.eliminarReserva = async (req, res) => {
             res.status(404).json({ error: 'Reserva no encontrada' });
         }
     } catch (error) {
-        console.error(`[Reserva] Error al eliminar la reserva | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar la reserva' });
+        next(error);
     }
 };
 exports.verificarDisponibilidad = async (req, res) => {
@@ -187,8 +183,7 @@ exports.verificarDisponibilidad = async (req, res) => {
         res.json({ disponible: true });
         console.log(`[Reserva] Disponibilidad para Mesa ${idmesa} en ${fecha} ${hora}: ${disponible}`);
     } catch (error) {
-        console.error(`[Reserva] Error al verificar disponibilidad | ${error.message}`);
-        res.status(500).json({ error: 'Error al verificar disponibilidad' });
+        next(error);
     }
 };
 
@@ -212,8 +207,7 @@ exports.verificarUsuario = async (req, res) => {
         res.json({ registrado: true });
         console.log(`[Reserva] Usuario ${idusuario} registrado: ${registrado}`);
     } catch (error) {
-        console.error(`[Reserva] Error al verificar usuario | ${error.message}`);
-        res.status(500).json({ error: 'Error al verificar usuario' });
+        next(error);
     }
 };
 
@@ -264,9 +258,9 @@ exports.enviarRecordatorios = async () => {
             console.log(`[Reserva] Recordatorio enviado a ${reserva.correo}`);
         }
 
-         console.log('[Reserva] Todos los recordatorios enviados');
+        console.log('[Reserva] Todos los recordatorios enviados');
     } catch (error) {
-        console.error(`[Reserva] Error al enviar recordatorios | ${error.message}`);
+        next(error);
     }
 };
 
@@ -275,7 +269,7 @@ exports.obtenerReservasPorUsuario = async (req, res) => {
     const { idUsuario } = req.params;
     console.log(`[Reserva] Obtener por usuario | Usuario: ${idUsuario}`);
 
-     if (!idUsuario) {
+    if (!idUsuario) {
         console.warn('[Reserva] Falta idUsuario en parámetros');
         return res.status(400).json({ error: 'El idUsuario es obligatorio.' });
     }
@@ -291,8 +285,7 @@ exports.obtenerReservasPorUsuario = async (req, res) => {
         console.log(`[Reserva] Reservas obtenidas para usuario ${idUsuario}: ${reservas.length}`);
         res.json(reservas);
     } catch (error) {
-        console.error(`[Reserva] Error al obtener reservas por usuario | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener reservas.' });
+        next(error);
     }
 };
 

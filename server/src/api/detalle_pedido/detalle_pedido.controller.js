@@ -18,8 +18,7 @@ exports.crearDetallePedido = async (req, res) => {
         console.log(`Detalle de pedido creado con éxito | Pedido ID: ${idpedido}`);
         res.status(201).json({ message: 'Detalle de pedido creado exitosamente' });
     } catch (error) {
-        console.error(`Error al crear detalle del pedido | ${error.message}`);
-        res.status(500).json({ error: 'Error al crear el detalle del pedido', details: error.message });
+        next(error);
     }
 };
 
@@ -40,8 +39,7 @@ exports.obtenerDetallesPedido = async (req, res) => {
         console.log(`Detalles de pedido obtenidos (${detalles.length} registros)`);
         res.json(detalles);
     } catch (error) {
-        console.error(`Error al obtener detalles de pedido | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener los detalles de pedido' });
+        next(error);
     }
 };
 
@@ -70,8 +68,7 @@ exports.actualizarDetallePedido = async (req, res) => {
             res.status(404).json({ error: 'Detalle de pedido no encontrado' });
         }
     } catch (error) {
-        console.error(`❌ Error al actualizar detalle del pedido | ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al actualizar el detalle del pedido' });
+        next(error);
     }
 };
 
@@ -94,8 +91,7 @@ exports.eliminarDetallePedido = async (req, res) => {
             res.status(404).json({ error: 'Detalle de pedido no encontrado' });
         }
     } catch (error) {
-        console.error(`Error al eliminar detalle del pedido | ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar el detalle del pedido' });
+        next(error);
     }
 };
 
@@ -127,7 +123,6 @@ exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
         console.log(`Detalles por pedido obtenidos | Pedido ID: ${pedido} | Registros: ${detalles.length}`);
         res.json(detalles);
     } catch (error) {
-        console.error(`Error al obtener detalles del pedido | Pedido ID: ${pedido} | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener los detalles del pedido' });
+        next(error);
     }
 };

@@ -21,8 +21,7 @@ exports.crearCalificacion = async (req, res) => {
       data: nuevaCalificacion[0],
     });
   } catch (error) {
-    console.error(`Error al crear calificación | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
-    res.status(500).json({ error: 'Error al crear la calificación' });
+    next(error);
   }
 };
 
@@ -43,8 +42,7 @@ exports.obtenerCalificaciones = async (req, res) => {
     console.log(`${calificaciones.length} calificaciones obtenidas`);
     res.json(calificaciones);
   } catch (error) {
-    console.error(`Error al obtener calificaciones: ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener las calificaciones' });
+    next(error);
   }
 };
 
@@ -72,8 +70,7 @@ exports.actualizarCalificacion = async (req, res) => {
       res.status(404).json({ error: "No se encontró la calificación para actualizar" });
     }
   } catch (error) {
-    console.error(`Error al actualizar calificación | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
-    res.status(500).json({ error: "Error al actualizar la calificación" });
+    next(error);
   }
 };
 
@@ -99,8 +96,7 @@ exports.eliminarCalificacion = async (req, res) => {
       res.status(404).json({ error: 'Calificación no encontrada' });
     }
   } catch (error) {
-    console.error(`Error al eliminar calificación | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al eliminar la calificación' });
+    next(error);
   }
 };
 
@@ -126,8 +122,7 @@ exports.existeResenia = async (req, res) => {
     console.log(`Verificación completada | Existe: ${reseña.length > 0}`);
     res.json({ existe: reseña.length > 0 });
   } catch (error) {
-    console.error(`Error al verificar reseña | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
-    res.status(500).json({ error: "Error al verificar la reseña" });
+    next(error);
   }
 };
 
@@ -155,8 +150,7 @@ exports.obtenerCalificacionesPorUsuario = async (req, res) => {
     console.log(`Calificaciones del usuario ${idusuario} obtenidas: ${calificaciones.length}`);
     res.json(calificaciones);
   } catch (error) {
-    console.error(`Error al obtener calificaciones del usuario ${idusuario}: ${error.message}`);
-    res.status(500).json({ error: "Error al obtener las calificaciones del usuario." });
+    next(error);
   }
 };
 
@@ -181,7 +175,6 @@ exports.calificarExperiencia = async (req, res) => {
       data: nuevaCalificacion[0],
     });
   } catch (error) {
-    console.error(`Error al calificar experiencia | Usuario: ${idusuario} | ${error.message}`);
-    res.status(500).json({ error: 'Error al calificar la experiencia' });
+    next(error);
   }
 };

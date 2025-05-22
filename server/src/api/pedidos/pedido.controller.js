@@ -72,8 +72,7 @@ exports.crearPedido = async (req, res) => {
       detalles: detallesCompletos
     });
   } catch (error) {
-    console.error(`[Pedido] Error al crear el pedido | ${error.message}`);
-    res.status(500).json({ error: "Error al crear el pedido." });
+    next(error);
   }
 };
 
@@ -89,8 +88,7 @@ exports.obtenerPedidos = async (req, res) => {
     console.log(`[Pedido] Pedidos obtenidos: ${pedidos.length}`);
     res.json(pedidos);
   } catch (error) {
-    console.error(`[Pedido] Error al obtener los pedidos | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener los pedidos' });
+    next(error);
   }
 };
 
@@ -118,8 +116,7 @@ exports.actualizarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al actualizar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar el pedido' });
+    next(error);
   }
 };
 
@@ -141,8 +138,7 @@ exports.eliminarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al eliminar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al eliminar el pedido' });
+    next(error);
   }
 };
 
@@ -170,8 +166,7 @@ exports.entregarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al entregar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al entregar el pedido' });
+    next(error);
   }
 };
 
@@ -199,8 +194,7 @@ exports.cancelarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al cancelar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al cancelar el pedido' });
+    next(error);
   }
 };
 
@@ -228,8 +222,7 @@ exports.registrarPagoPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al pagar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al pagar el pedido' });
+    next(error);
   }
 };
 
@@ -255,7 +248,6 @@ exports.obtenerPedidosPorUsuario = async (req, res) => {
     console.log(`[Pedido] Pedidos obtenidos para usuario ${idUsuario}: ${pedidos.length}`);
     res.json(pedidos);
   } catch (error) {
-    console.error(`[Pedido] Error al obtener pedidos por usuario | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener los pedidos.' });
+    next(error);
   }
 };

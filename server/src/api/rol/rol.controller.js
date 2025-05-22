@@ -1,19 +1,18 @@
 // src/api/rol.controller.js
 const Rol = require('../rol/rol.model');
 
-exports.getAllRoles = async (req, res) => {
+exports.getAllRoles = async (req, res, next) => {
   console.log('[Rol] Obtener todos los roles');
   try {
     const roles = await Rol.findAll();
     console.log(`[Rol] Roles obtenidos: ${roles.length}`);
     res.status(200).json(roles);
   } catch (error) {
-    console.error(`[Rol] Error fetching roles | ${error.message}`);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
-exports.getRolById = async (req, res) => {
+exports.getRolById = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Rol] Obtener por ID | idrol: ${id}`);
   try {
@@ -25,12 +24,11 @@ exports.getRolById = async (req, res) => {
     console.log(`[Rol] Rol encontrado | idrol: ${id}`);
     res.status(200).json(rol);
   } catch (error) {
-    console.error(`[Rol] Error fetching rol | idrol: ${id} | ${error.message}`);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
-exports.createRol = async (req, res) => {
+exports.createRol = async (req, res, next) => {
   console.log('📥 [Rol] Crear nuevo rol | Datos:', req.body);
   try {
     const {
@@ -50,12 +48,11 @@ exports.createRol = async (req, res) => {
     console.log(`[Rol] Rol creado | idrol: ${newRol.idrol}`);
     return res.status(201).json(newRol);
   } catch (error) {
-    console.error(`[Rol] Error creating rol | ${error.message}`);
-    return res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
-exports.updateRol = async (req, res) => {
+exports.updateRol = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Rol] Actualizar | idrol: ${id} | Datos:`, req.body);
   try {
@@ -83,12 +80,11 @@ exports.updateRol = async (req, res) => {
     console.log(`[Rol] Rol actualizado | idrol: ${id}`);
     res.status(200).json({ message: 'Rol updated successfully' });
   } catch (error) {
-    console.error(`[Rol] Error updating rol | idrol: ${id} | ${error.message}`);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
-exports.deleteRol = async (req, res) => {
+exports.deleteRol = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Rol] Eliminar | idrol: ${id}`);
   try {
@@ -100,7 +96,6 @@ exports.deleteRol = async (req, res) => {
     console.log(`[Rol] Rol eliminado | idrol: ${id}`);
     res.status(200).json({ message: 'Rol deleted successfully' });
   } catch (error) {
-    console.error(`[Rol] Error deleting rol | idrol: ${id} | ${error.message}`);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };

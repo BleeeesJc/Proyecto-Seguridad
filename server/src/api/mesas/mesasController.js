@@ -9,8 +9,7 @@ const obtenerMesa = async (req, res) => {
     console.log(`Mesas obtenidas (${mesas.length} registros)`);
     res.status(200).json(mesas);
   } catch (error) {
-    console.error(`Error al obtener mesas: ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener las actividades' });
+    next(error);
   }
 };
 
@@ -30,8 +29,7 @@ const obtenerMesaPorId = async (req, res) => {
     console.log(`Mesa encontrada | ID: ${id}`);
     res.status(200).json(mesa);
   } catch (error) {
-    console.error(`Error al obtener la mesa | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener la mesa.' });
+    next(error);
   }
 };
 
@@ -45,8 +43,7 @@ const crearMesa = async (req, res) => {
     console.log(`Mesa creada | ID: ${nuevaMesa.idmesa}`);
     res.status(201).json(nuevaMesa);
   } catch (error) {
-    console.error(`Error al crear mesa: ${error.message}`);
-    res.status(500).json({ error: 'Error al crear la Mesa' });
+    next(error);
   }
 };
 
@@ -73,8 +70,7 @@ const actualizarMesa = async (req, res) => {
     console.log(`Mesa actualizada | ID: ${id}`);
     res.status(200).json(mesa);
   } catch (error) {
-    console.error(`Error al actualizar la mesa | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar la mesa' });
+    next(error);
   }
 };
 
@@ -95,8 +91,7 @@ const borrarMesa = async (req, res) => {
     console.log(`Mesa eliminada con éxito | ID: ${id}`);
     res.status(200).json({ message: 'Mesa eliminada con éxito' });
   } catch (error) {
-    console.error(`Error al eliminar la mesa | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al borrar la mesa' });
+    next(error);
   }
 };
 
@@ -120,8 +115,7 @@ const actualizarEstadoMesa = async (req, res) => {
     console.log(`Visibilidad actualizada | ID: ${id}, Visible: ${visible}`);
     res.status(200).json({ message: 'Estado de la mesa actualizado con éxito', mesa });
   } catch (error) {
-    console.error(`Error al actualizar visibilidad | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar el estado de la mesa' });
+    next(error);
   }
 };
 

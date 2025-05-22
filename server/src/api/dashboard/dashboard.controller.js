@@ -16,8 +16,7 @@ const dashboardController = {
             console.log(`Total de pedidos obtenidos | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener total de pedidos | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener el total de pedidos.' });
+            next(error);
         }
     },
 
@@ -36,8 +35,7 @@ const dashboardController = {
             console.log(`Ingresos totales obtenidos | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener ingresos totales | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener los ingresos totales.' });
+            next(error);
         }
     },
 
@@ -56,8 +54,7 @@ const dashboardController = {
             console.log(`Calificación promedio obtenida | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener calificación promedio | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener la calificación promedio.' });
+            next(error);
         }
     },
 
@@ -76,8 +73,7 @@ const dashboardController = {
             console.log(`Ingresos por día obtenidos | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener ingresos por día | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener los ingresos por día.' });
+            next(error);
         }
     },
 
@@ -89,8 +85,7 @@ const dashboardController = {
             console.log(`Ingresos por mes obtenidos`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener ingresos por mes | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener los ingresos por mes.' });
+            next(error);
         }
     },
 
@@ -109,8 +104,7 @@ const dashboardController = {
             console.log(`Consumo por horas obtenido | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener consumo por horas | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener el consumo por horas.' });
+            next(error);
         }
     },
 
@@ -129,8 +123,7 @@ const dashboardController = {
             console.log(`Productos más vendidos obtenidos | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener productos más vendidos | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener los productos más vendidos.' });
+            next(error);
         }
     },
 
@@ -149,8 +142,7 @@ const dashboardController = {
             console.log(`Reseñas por platos obtenidas | Mes: ${monthNumber}`);
             res.json(data);
         } catch (error) {
-            console.error(`Error al obtener reseñas por platos | Mes: ${monthNumber} | ${error.message}`);
-            res.status(500).json({ error: 'Error al obtener las reseñas por platillos.' });
+            next(error);
         }
     }
 };

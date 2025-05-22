@@ -53,6 +53,7 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2'; // Para usar SweetAlert2
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default {
   name: 'RegistroUsuario',
