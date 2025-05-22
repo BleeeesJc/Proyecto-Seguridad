@@ -15,9 +15,8 @@ exports.getAllLogs = async (req, res) => {
     } = req.query;
 
     const where = {};
-
-    if (accion)    where.accion = { [Op.iLike]: `%${accion}%` };
-    if (medio)     where.medio  = { [Op.iLike]: `%${medio}%` };
+    if (accion)    where.accion    = { [Op.iLike]: `%${accion}%` };
+    if (medio)     where.medio     = { [Op.iLike]: `%${medio}%` };
     if (idusuario) where.idusuario = idusuario;
     if (fechaDesde || fechaHasta) {
       where.fecha = {};
@@ -27,24 +26,21 @@ exports.getAllLogs = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    const { rows: logs, count } = await Log.findAndCountAll({
+    // findAndCountAll te sigue dando count si lo necesitas, pero aquí sólo devolvemos rows
+    const { rows: logs /*, count*/ } = await Log.findAndCountAll({
       where,
       order: [['fecha', 'DESC']],
       limit: +limit,
       offset,
     });
 
-    res.json({
-      total: count,
-      page: +page,
-      perPage: +limit,
-      data: logs,
-    });
+    // Ahora devolvemos directamente el array de logs
+    res.json(logs);
   } catch (error) {
     console.error('Error al obtener logs:', error);
     res.status(500).json({ message: 'Error al obtener los registros' });
   }
-};
+}
 
 exports.getLogById = async (req, res) => {
   try {

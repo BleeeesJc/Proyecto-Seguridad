@@ -24,7 +24,7 @@
             <td>{{ log.idlog }}</td>
             <td>{{ log.accion }}</td>
             <td>{{ log.medio }}</td>
-            <td>{{ formatFecha(log.fecha) }}</td>
+            <td>{{ formatFecha(log.fecha) || '–' }}</td>
             <td>{{ log.origen }}</td>
             <td>{{ log.idusuario }}</td>
             <td>{{ log.codigo }}</td>
@@ -45,7 +45,7 @@
 import axios from 'axios';
 import HeaderAdminTitle from '@/components/HeaderAdminTitle.vue';
 import SuccessModal from '@/components/SuccessModal.vue';
-import { format } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 
 export default {
   name: 'LogsTable',
@@ -79,7 +79,21 @@ export default {
       }
     },
     formatFecha(fecha) {
-      return format(new Date(fecha), 'dd/MM/yyyy HH:mm:ss');
+      // 1) Si no hay valor, devolvemos vacío o 'N/A'
+      if (!fecha) return '';
+
+      // 2) Parseamos según tipo
+      const date = typeof fecha === 'string'
+        ? parseISO(fecha)
+        : new Date(fecha);
+
+      // 3) Validamos
+      if (!isValid(date)) {
+        console.warn('Fecha inválida en log:', fecha);
+        return '';
+      }
+
+      return format(date, 'dd/MM/yyyy HH:mm:ss');
     },
   },
 };
@@ -93,16 +107,18 @@ export default {
 
 .table {
   width: 100%;
-  table-layout: fixed;
+  table-layout: fixed; /* columnas de ancho fijo */
 }
 
-.table th, .table td {
-  text-align: center;
+.table th,
+.table td {
   padding: 8px;
   border: 1px solid #ddd;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;     /* permitir saltos de línea */
+  word-wrap: break-word;   /* romper palabras largas */
+  word-break: break-word;  /* compatibilidad */
+  text-align: center;      /* ¡centrar texto! */
+  vertical-align: middle;  /* centrar verticalmente si hay varias líneas */
 }
 
 .table th {
