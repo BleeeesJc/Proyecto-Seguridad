@@ -22,6 +22,7 @@
             <th>Pedido Cliente</th>
             <th>Mapa Cliente</th>
             <th>Menu Cliente</th>
+            <th>Logs</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -150,6 +151,16 @@
                 'fas',
                 rol.menucliente ? 'fa-check' : 'fa-times',
                 rol.menucliente ? 'true-icon' : 'false-icon',
+              ]" />
+            </td>
+            <td v-if="index === filaEnEdicion">
+              <input type="checkbox" v-model="rolEditado.logs" />
+            </td>
+            <td v-else>
+              <i :class="[
+                'fas',
+                rol.logs ? 'fa-check' : 'fa-times',
+                rol.logs? 'true-icon' : 'false-icon',
               ]" />
             </td>
             <td class="botones">

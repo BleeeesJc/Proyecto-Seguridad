@@ -57,6 +57,7 @@ export default {
         pedidocliente: false,
         mapacliente: false,
         menucliente: false,
+        logs: false
       },
       permisos: [
         { key: "asignacionroles", label: "Asignación de Roles" },
@@ -71,6 +72,7 @@ export default {
         { key: "platillos", label: "Platillos" },
         { key: "reservas", label: "Reservas" },
         { key: "usuarios", label: "Usuarios" },
+        { key: "logs", label: "Logs" },
       ],
       successModalVisible: false,
       successMensaje: "",

@@ -60,6 +60,10 @@ const Rol = sequelize.define('Rol', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
+  logs: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
 }, {
   timestamps: false,
   tableName: 'rol'

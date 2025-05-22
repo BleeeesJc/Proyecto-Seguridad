@@ -40,6 +40,7 @@ const login = async (req, res) => {
           "pedidocliente",
           "mapacliente",
           "menucliente",
+          "logs",
         ],
       },
     });

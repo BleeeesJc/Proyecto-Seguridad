@@ -25,6 +25,7 @@ import JReservasAdminComponent from '@/ventanas/reservas/Reservas.vue';
 import UsuariosAdminComponent from '../ventanas/UsuariosAdminComponent.vue';
 import DashboardComponent from '../ventanas/dashboardComponent.vue';
 import RolComponent from '@/ventanas/RolComponent.vue';
+import LogsComponent from '@/ventanas/LogsComponent.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -162,6 +163,11 @@ const router = createRouter({
           path: 'pedidosadmin',
           name: 'PedidosAdmin',
           component: PedidosAdmin,
+        },
+        {
+          path: 'logs',
+          name: 'LogsSistema',
+          component: LogsComponent,
         },
       ],
     },

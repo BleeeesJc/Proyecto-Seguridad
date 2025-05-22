@@ -30,6 +30,7 @@ const pagosRoutes = require('./src/api/pagos/pago.routes');
 const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
 const rolRoutes = require('./src/api/rol/rol.routes');
 const platillosRoutes = require('./src/api/platillos/platillo.routes');
+const logRouters = require('./src/api/logs/log.routes')
 
 app.use('/api/platillos', platillosRoutes);
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
@@ -48,6 +49,7 @@ app.use('/api/detalle_pedido', detalle_pedidoRoutes);
 app.use('/api/pagos', pagosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/calificaciones', calificacionRoutes);
+app.use('/api/log',logRouters);
 
 
 

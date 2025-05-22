@@ -66,13 +66,13 @@ exports.createRol = async (req, res) => {
     const {
       rol, asignacionroles, dashboard, ofertas, usuarios,
       platillos, pedidos, reservas, mapainteractivo,
-      ofertacliente, pedidocliente, mapacliente, menucliente
+      ofertacliente, pedidocliente, mapacliente, menucliente,logs
     } = req.body;
 
     const newRol = await Rol.create({
       rol, asignacionroles, dashboard, ofertas, usuarios,
       platillos, pedidos, reservas, mapainteractivo,
-      ofertacliente, pedidocliente, mapacliente, menucliente
+      ofertacliente, pedidocliente, mapacliente, menucliente,logs
     });
 
     await Logs.create({
@@ -105,14 +105,14 @@ exports.updateRol = async (req, res) => {
   const {
     rol, asignacionroles, dashboard, ofertas, usuarios,
     platillos, pedidos, reservas, mapainteractivo,
-    ofertacliente, pedidocliente, mapacliente, menucliente
+    ofertacliente, pedidocliente, mapacliente, menucliente,logs
   } = req.body;
 
   try {
     const [updated] = await Rol.update({
       rol, asignacionroles, dashboard, ofertas, usuarios,
       platillos, pedidos, reservas, mapainteractivo,
-      ofertacliente, pedidocliente, mapacliente, menucliente
+      ofertacliente, pedidocliente, mapacliente, menucliente,logs
     }, {
       where: { idrol: id }
     });
