@@ -1,106 +1,203 @@
 // src/api/rol.controller.js
 const Rol = require('../rol/rol.model');
+const Logs = require("../logs/log.model");
+const axios = require("axios");
 
+// GET ALL ROLES
 exports.getAllRoles = async (req, res) => {
-  console.log('[Rol] Obtener todos los roles');
+  const idUsuario = req.user.id;
   try {
     const roles = await Rol.findAll();
-    console.log(`[Rol] Roles obtenidos: ${roles.length}`);
     res.status(200).json(roles);
+    await Logs.create({
+      accion: `Usuario ${idUsuario} consultó todos los roles`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "usuario",
+      idusuario: idUsuario,
+      codigo: 200,
+    });
   } catch (error) {
-    console.error(`[Rol] Error fetching roles | ${error.message}`);
+    console.error('Error fetching roles:', error);
+    await Logs.create({
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al extraer todos los roles: ${error.message}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "sistema",
+      idusuario: idUsuario,
+      codigo: 500,
+    });
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+// GET ROL BY ID
 exports.getRolById = async (req, res) => {
+  const idUsuario = req.user.id;
   const { id } = req.params;
-  console.log(`[Rol] Obtener por ID | idrol: ${id}`);
   try {
     const rol = await Rol.findByPk(id);
     if (!rol) {
-      console.warn(`[Rol] Rol no encontrado | idrol: ${id}`);
+      await Logs.create({
+        accion: `El usuario ${idUsuario} intentó buscar rol con id ${id}, pero no fue encontrado`,
+        medio: "rol",
+        fecha: new Date(),
+        origen: "sistema",
+        idusuario: idUsuario,
+        codigo: 404,
+      });
       return res.status(404).json({ message: 'Rol not found' });
     }
-    console.log(`[Rol] Rol encontrado | idrol: ${id}`);
     res.status(200).json(rol);
   } catch (error) {
-    console.error(`[Rol] Error fetching rol | idrol: ${id} | ${error.message}`);
+    console.error('Error fetching rol:', error);
+    await Logs.create({
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al buscar rol por ID ${id}: ${error.message}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "sistema",
+      idusuario: idUsuario,
+      codigo: 500,
+    });
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+// CREATE ROL
 exports.createRol = async (req, res) => {
-  console.log('📥 [Rol] Crear nuevo rol | Datos:', req.body);
+  const idUsuario = req.user.id;
   try {
     const {
-      rol, asignacionroles, dashboard, ofertas,
-      usuarios, platillos, pedidos, reservas,
-      mapainteractivo, ofertacliente, pedidocliente,
-      mapacliente, menucliente
+      rol, asignacionroles, dashboard, ofertas, usuarios,
+      platillos, pedidos, reservas, mapainteractivo,
+      ofertacliente, pedidocliente, mapacliente, menucliente, logs
     } = req.body;
 
     const newRol = await Rol.create({
-      rol, asignacionroles, dashboard, ofertas,
-      usuarios, platillos, pedidos, reservas,
-      mapainteractivo, ofertacliente, pedidocliente,
-      mapacliente, menucliente
+      rol, asignacionroles, dashboard, ofertas, usuarios,
+      platillos, pedidos, reservas, mapainteractivo,
+      ofertacliente, pedidocliente, mapacliente, menucliente, logs
     });
 
-    console.log(`[Rol] Rol creado | idrol: ${newRol.idrol}`);
+    await Logs.create({
+      accion: `Usuario ${idUsuario} creó un nuevo rol: "${rol}" con ID ${newRol.idrol}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "usuario",
+      idusuario: idUsuario,
+      codigo: 201,
+    });
+
     return res.status(201).json(newRol);
   } catch (error) {
-    console.error(`[Rol] Error creating rol | ${error.message}`);
+    console.error('[Rol] Error creating rol:', error);
+    await Logs.create({
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al crear un nuevo rol "${req.body.rol}": ${error.message}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "sistema",
+      idusuario: idUsuario,
+      codigo: 500,
+    });
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+// UPDATE ROL
 exports.updateRol = async (req, res) => {
+  const idUsuario = req.user.id;
   const { id } = req.params;
-  console.log(`[Rol] Actualizar | idrol: ${id} | Datos:`, req.body);
-  try {
-    const {
-      rol, asignacionroles, dashboard, ofertas,
-      usuarios, platillos, pedidos, reservas,
-      mapainteractivo, ofertacliente, pedidocliente,
-      mapacliente, menucliente
-    } = req.body;
+  const {
+    rol, asignacionroles, dashboard, ofertas, usuarios,
+    platillos, pedidos, reservas, mapainteractivo,
+    ofertacliente, pedidocliente, mapacliente, menucliente, logs
+  } = req.body;
 
+  try {
     const [updated] = await Rol.update({
-      rol, asignacionroles, dashboard, ofertas,
-      usuarios, platillos, pedidos, reservas,
-      mapainteractivo, ofertacliente, pedidocliente,
-      mapacliente, menucliente
+      rol, asignacionroles, dashboard, ofertas, usuarios,
+      platillos, pedidos, reservas, mapainteractivo,
+      ofertacliente, pedidocliente, mapacliente, menucliente, logs
     }, {
       where: { idrol: id }
     });
 
     if (!updated) {
-      console.warn(`[Rol] Rol no encontrado para actualizar | idrol: ${id}`);
+      await Logs.create({
+        accion: `El usuario ${idUsuario} intentó actualizar rol con ID ${id}, pero no fue encontrado`,
+        medio: "rol",
+        fecha: new Date(),
+        origen: "sistema",
+        idusuario: idUsuario,
+        codigo: 404,
+      });
       return res.status(404).json({ message: 'Rol not found' });
     }
 
-    console.log(`[Rol] Rol actualizado | idrol: ${id}`);
+    await Logs.create({
+      accion: `Usuario ${idUsuario} actualizó el rol con ID ${id} a nombre "${rol}"`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "usuario",
+      idusuario: idUsuario,
+      codigo: 200,
+    });
+
     res.status(200).json({ message: 'Rol updated successfully' });
   } catch (error) {
-    console.error(`[Rol] Error updating rol | idrol: ${id} | ${error.message}`);
+    console.error('Error updating rol:', error);
+    await Logs.create({
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al actualizar rol con ID ${id}: ${error.message}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "sistema",
+      idusuario: idUsuario,
+      codigo: 500,
+    });
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
+// DELETE ROL
 exports.deleteRol = async (req, res) => {
+  const idUsuario = req.user.id;
   const { id } = req.params;
-  console.log(`[Rol] Eliminar | idrol: ${id}`);
+
   try {
     const deleted = await Rol.destroy({ where: { idrol: id } });
+
     if (!deleted) {
-      console.warn(`[Rol] Rol no encontrado para eliminar | idrol: ${id}`);
+      await Logs.create({
+        accion: `El usuario ${idUsuario} intentó eliminar rol con ID ${id}, pero no fue encontrado`,
+        medio: "rol",
+        fecha: new Date(),
+        origen: "sistema",
+        idusuario: idUsuario,
+        codigo: 404,
+      });
       return res.status(404).json({ message: 'Rol not found' });
     }
-    console.log(`[Rol] Rol eliminado | idrol: ${id}`);
+
+    await Logs.create({
+      accion: `Usuario ${idUsuario} eliminó el rol con ID ${id}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "usuario",
+      idusuario: idUsuario,
+      codigo: 200,
+    });
+
     res.status(200).json({ message: 'Rol deleted successfully' });
   } catch (error) {
-    console.error(`[Rol] Error deleting rol | idrol: ${id} | ${error.message}`);
+    console.error('Error deleting rol:', error);
+    await Logs.create({
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al eliminar rol con ID ${id}: ${error.message}`,
+      medio: "rol",
+      fecha: new Date(),
+      origen: "sistema",
+      idusuario: idUsuario,
+      codigo: 500,
+    });
     res.status(500).json({ message: 'Internal server error' });
   }
 };

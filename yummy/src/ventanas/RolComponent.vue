@@ -1,16 +1,8 @@
 <template>
   <div>
-    <HeaderAdminTitle
-      icon="fas fa-user-tag"
-      title="Rol"
-      subtitle="Visualiza la Matriz de Roles"
-    />
-    <ConfirmationModal
-      v-if="modalVisible"
-      :mensaje="`¿Seguro que desea eliminar el Rol ${rolAEliminar.rol}?`"
-      @onCancel="cerrarModal"
-      @onConfirm="eliminarRol"
-    />
+    <HeaderAdminTitle icon="fas fa-user-tag" title="Rol" subtitle="Visualiza la Matriz de Roles" />
+    <ConfirmationModal v-if="modalVisible" :mensaje="`¿Seguro que desea eliminar el Rol ${rolAEliminar.rol}?`"
+      @onCancel="cerrarModal" @onConfirm="eliminarRol" />
 
     <div class="table-container">
       <table class="table">
@@ -30,6 +22,7 @@
             <th>Pedido Cliente</th>
             <th>Mapa Cliente</th>
             <th>Menu Cliente</th>
+            <th>Logs</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -44,173 +37,145 @@
               <input type="checkbox" v-model="rolEditado.asignacionroles" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.asignacionroles ? 'fa-check' : 'fa-times',
-                  rol.asignacionroles ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.asignacionroles ? 'fa-check' : 'fa-times',
+                rol.asignacionroles ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.dashboard" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.dashboard ? 'fa-check' : 'fa-times',
-                  rol.dashboard ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.dashboard ? 'fa-check' : 'fa-times',
+                rol.dashboard ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.ofertas" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.ofertas ? 'fa-check' : 'fa-times',
-                  rol.ofertas ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.ofertas ? 'fa-check' : 'fa-times',
+                rol.ofertas ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.usuarios" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.usuarios ? 'fa-check' : 'fa-times',
-                  rol.usuarios ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.usuarios ? 'fa-check' : 'fa-times',
+                rol.usuarios ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.platillos" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.platillos ? 'fa-check' : 'fa-times',
-                  rol.platillos ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.platillos ? 'fa-check' : 'fa-times',
+                rol.platillos ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.pedidos" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.pedidos ? 'fa-check' : 'fa-times',
-                  rol.pedidos ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.pedidos ? 'fa-check' : 'fa-times',
+                rol.pedidos ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.reservas" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.reservas ? 'fa-check' : 'fa-times',
-                  rol.reservas ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.reservas ? 'fa-check' : 'fa-times',
+                rol.reservas ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.mapainteractivo" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.mapainteractivo ? 'fa-check' : 'fa-times',
-                  rol.mapainteractivo ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.mapainteractivo ? 'fa-check' : 'fa-times',
+                rol.mapainteractivo ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.ofertacliente" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.ofertacliente ? 'fa-check' : 'fa-times',
-                  rol.ofertacliente ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.ofertacliente ? 'fa-check' : 'fa-times',
+                rol.ofertacliente ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.pedidocliente" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.pedidocliente ? 'fa-check' : 'fa-times',
-                  rol.pedidocliente ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.pedidocliente ? 'fa-check' : 'fa-times',
+                rol.pedidocliente ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.mapacliente" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.mapacliente ? 'fa-check' : 'fa-times',
-                  rol.mapacliente ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.mapacliente ? 'fa-check' : 'fa-times',
+                rol.mapacliente ? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td v-if="index === filaEnEdicion">
               <input type="checkbox" v-model="rolEditado.menucliente" />
             </td>
             <td v-else>
-              <i
-                :class="[
-                  'fas',
-                  rol.menucliente ? 'fa-check' : 'fa-times',
-                  rol.menucliente ? 'true-icon' : 'false-icon',
-                ]"
-              />
+              <i :class="[
+                'fas',
+                rol.menucliente ? 'fa-check' : 'fa-times',
+                rol.menucliente ? 'true-icon' : 'false-icon',
+              ]" />
+            </td>
+            <td v-if="index === filaEnEdicion">
+              <input type="checkbox" v-model="rolEditado.logs" />
+            </td>
+            <td v-else>
+              <i :class="[
+                'fas',
+                rol.logs ? 'fa-check' : 'fa-times',
+                rol.logs? 'true-icon' : 'false-icon',
+              ]" />
             </td>
             <td class="botones">
-              <button
-                v-if="index !== filaEnEdicion"
-                class="action-button edit-button"
-                @click="seleccionarRolParaEditar(index, rol)"
-              >
+              <button v-if="index !== filaEnEdicion" class="action-button edit-button"
+                @click="seleccionarRolParaEditar(index, rol)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button
-                v-if="index !== filaEnEdicion"
-                class="action-button delete-button"
-                @click="mostrarModalEliminar(rol)"
-              >
+              <button v-if="index !== filaEnEdicion" class="action-button delete-button"
+                @click="mostrarModalEliminar(rol)">
                 <i class="fas fa-trash"></i>
               </button>
-              <button
-                v-if="index === filaEnEdicion"
-                class="action-button button-save"
-                @click="guardarCambios"
-              >
+              <button v-if="index === filaEnEdicion" class="action-button button-save" @click="guardarCambios">
                 <i class="fa-solid fa-floppy-disk"></i>
               </button>
-              <button
-                v-if="index === filaEnEdicion"
-                class="action-button button-cancel"
-                @click="cancelarCambios"
-              >
+              <button v-if="index === filaEnEdicion" class="action-button button-cancel" @click="cancelarCambios">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </td>
@@ -220,11 +185,7 @@
       <FormNewRol @rol-creado="addRol" />
     </div>
 
-    <SuccessModal
-      v-if="successModalVisible"
-      :mensaje="successMensaje"
-      @onClose="closeSuccessModal"
-    />
+    <SuccessModal v-if="successModalVisible" :mensaje="successMensaje" @onClose="closeSuccessModal" />
   </div>
 </template>
 
@@ -260,7 +221,12 @@ export default {
   methods: {
     async obtenerRoles() {
       try {
-        const response = await axios.get("http://localhost:5000/api/rol");
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/api/rol", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.roles = response.data;
       } catch (error) {
         console.error("Error al obtener los roles:", error);
@@ -276,10 +242,15 @@ export default {
     },
     async guardarCambios() {
       try {
+        const token = localStorage.getItem("token");
         await axios.put(
           `http://localhost:5000/api/rol/${this.rolEditado.idrol}`,
           this.rolEditado
-        );
+        , {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.roles.splice(this.filaEnEdicion, 1, { ...this.rolEditado });
         this.filaEnEdicion = null;
         this.mostrarSuccessModal("Rol actualizado correctamente");
@@ -301,9 +272,13 @@ export default {
     },
     async eliminarRol() {
       try {
+        const token = localStorage.getItem("token");
         await axios.delete(
-          `http://localhost:5000/api/rol/${this.rolAEliminar.idrol}`
-        );
+          `http://localhost:5000/api/rol/${this.rolAEliminar.idrol}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.roles = this.roles.filter(
           (r) => r.idrol !== this.rolAEliminar.idrol
         );
@@ -344,7 +319,7 @@ export default {
   padding: 10px;
   border: 1px solid #ddd;
   white-space: normal;
-  max-width: 120px; 
+  max-width: 120px;
 }
 
 .table td {
@@ -355,7 +330,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal;
-  max-width: 120px; 
+  max-width: 120px;
 }
 
 .true-icon {

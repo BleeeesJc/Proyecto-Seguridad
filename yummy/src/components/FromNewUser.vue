@@ -27,7 +27,7 @@
       </div>
 
       <div class="form-group">
-        <label for="correo"> <i class="fas fa-envelope"></i> Correo </label>
+        <label for="correo"> <i class="fas fa-envelope"></i> Id Usuario </label>
         <input
           v-model="nuevoUsuario.correo"
           id="correo"
