@@ -99,7 +99,8 @@ export default {
         return;
       }
 
-      const idUsuario = localStorage.getItem("id");
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      const idUsuario = usuario?.idusuario;
       if (!idUsuario) {
         alert("Debe iniciar sesión antes de realizar un pedido.");
         return;
@@ -119,6 +120,14 @@ export default {
 
       try {
         const response = await axios.post("http://localhost:5000/api/pedidos", pedido);
+        await axios.post(`http://localhost:5000/api/log/`, {
+          accion: `Usuario ${idUsuario} realizó un pedido (ID ${response.data.idpedido})`,
+          medio: "pedidos",
+          fecha: new Date(),
+          origen: "usuario",
+          idusuario: idUsuario,
+          codigo: 201
+        });
 
         await axios.post("http://localhost:5000/api/usuario/confirmar-pedido", {
           idUsuario: response.data.idusuario,
@@ -126,11 +135,28 @@ export default {
           precio_total: response.data.precio_total
         });
 
+        await axios.post(`http://localhost:5000/api/log/`, {
+          accion: `Usuario ${idUsuario} confirmó envío de detalles del pedido ${response.data.idpedido}`,
+          medio: "pedidos",
+          fecha: new Date(),
+          origen: "usuario",
+          idusuario: idUsuario,
+          codigo: 200
+        });
+
         this.mostrarSuccessModal("Pedido realizado con éxito. Revisa tu correo electrónico.");
         this.$emit("pedidoRealizado");
         this.toggleModal();
         this.generarPDF(); // Llamada a la función para generar el PDF
       } catch (error) {
+         await axios.post(`http://localhost:5000/api/log/`, {
+          accion: `Error del sistema al procesar pedido para usuario ${idUsuario}: ${error.message}`,
+          medio: "pedidos",
+          fecha: new Date(),
+          origen: "sistema",
+          idusuario: idUsuario,
+          codigo: error.response?.status || 500
+        });
         console.error("Error al realizar el pedido:", error);
         alert("Hubo un error al realizar el pedido. Por favor, inténtelo nuevamente.");
       }

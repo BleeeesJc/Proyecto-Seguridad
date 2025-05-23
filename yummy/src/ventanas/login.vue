@@ -43,6 +43,7 @@
 import { useAuthStore } from '../stores/usuariosStore'; // Asegúrate de importar el store correcto
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import axios from 'axios';
 
 export default {
   name: "LogIn",
@@ -94,6 +95,14 @@ export default {
           title: 'Captcha requerido',
           text: 'Por favor completa el reCAPTCHA antes de continuar.',
         });
+        await axios.post(`http://localhost:5000/api/log/`, {
+          accion: `Usuario intentó iniciar sesión sin completar reCAPTCHA (email=${this.email})`,
+          medio: "auth",
+          fecha: new Date(),
+          origen: "usuario",
+          idusuario: null,
+          codigo: 400
+        });
         return;
       }
 
@@ -135,6 +144,14 @@ export default {
             title: 'Cuenta bloqueada',
             text: 'Has alcanzado el máximo de intentos fallidos. Tu cuenta acaba de ser bloqueada.',
           });
+          await axios.post(`http://localhost:5000/api/log/`, {
+              accion: `Cuenta ${this.email} bloqueada tras ${this.loginAttempts} intentos fallidos`,
+              medio: "auth",
+              fecha: new Date(),
+              origen: "usuario",
+              idusuario: null,
+              codigo: 403
+            });
         } else {
           // Si el login falla, muestra un mensaje de error
           this.error = 'Correo o contraseña incorrectos';
