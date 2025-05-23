@@ -1,7 +1,7 @@
 // src/api/pedidos/pedido.controller.js
 const sequelize = require('../../config/db');
 
-exports.crearPedido = async (req, res) => {
+exports.crearPedido = async (req, res, next) => {
   const { fecha, hora, estado, idusuario, precio_total, detalles } = req.body;
   console.log(`[Pedido] Crear | Usuario: ${idusuario}, Fecha: ${fecha} ${hora}, Total: ${precio_total}, Ítems: ${detalles?.length}`);
 
@@ -72,12 +72,11 @@ exports.crearPedido = async (req, res) => {
       detalles: detallesCompletos
     });
   } catch (error) {
-    console.error(`[Pedido] Error al crear el pedido | ${error.message}`);
-    res.status(500).json({ error: "Error al crear el pedido." });
+    next(error);
   }
 };
 
-exports.obtenerPedidos = async (req, res) => {
+exports.obtenerPedidos = async (req, res, next) => {
   console.log('[Pedido] Obtener todos');
   try {
     const pedidos = await sequelize.query(
@@ -89,12 +88,11 @@ exports.obtenerPedidos = async (req, res) => {
     console.log(`[Pedido] Pedidos obtenidos: ${pedidos.length}`);
     res.json(pedidos);
   } catch (error) {
-    console.error(`[Pedido] Error al obtener los pedidos | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener los pedidos' });
+    next(error);
   }
 };
 
-exports.actualizarPedido = async (req, res) => {
+exports.actualizarPedido = async (req, res, next) => {
   const { id } = req.params;
   const { fecha, hora, estado, idusuario, precio_total } = req.body;
   console.log(`[Pedido] Actualizar | ID: ${id}`);
@@ -118,12 +116,11 @@ exports.actualizarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al actualizar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar el pedido' });
+    next(error);
   }
 };
 
-exports.eliminarPedido = async (req, res) => {
+exports.eliminarPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Eliminar | ID: ${id}`);
 
@@ -141,13 +138,12 @@ exports.eliminarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al eliminar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al eliminar el pedido' });
+    next(error);
   }
 };
 
 // Cambia el estado de un pedido a entregado (1)
-exports.entregarPedido = async (req, res) => {
+exports.entregarPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Entregar | ID: ${id}`);
 
@@ -170,13 +166,12 @@ exports.entregarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al entregar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al entregar el pedido' });
+    next(error);
   }
 };
 
 // Cambia el estado de un pedido a cancelado (2)
-exports.cancelarPedido = async (req, res) => {
+exports.cancelarPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Cancelar | ID: ${id}`);
 
@@ -199,13 +194,12 @@ exports.cancelarPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al cancelar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al cancelar el pedido' });
+    next(error);
   }
 };
 
 // Cambia el estado de un pedido a pagado (3)
-exports.registrarPagoPedido = async (req, res) => {
+exports.registrarPagoPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Registrar pago | ID: ${id}`);
 
@@ -228,12 +222,11 @@ exports.registrarPagoPedido = async (req, res) => {
       res.status(404).json({ error: 'Pedido no encontrado' });
     }
   } catch (error) {
-    console.error(`[Pedido] Error al pagar el pedido | ${error.message}`);
-    res.status(500).json({ error: 'Error al pagar el pedido' });
+    next(error);
   }
 };
 
-exports.obtenerPedidosPorUsuario = async (req, res) => {
+exports.obtenerPedidosPorUsuario = async (req, res, next) => {
   const { idUsuario } = req.params;
   console.log(`[Pedido] Obtener por usuario | Usuario: ${idUsuario}`);
 
@@ -255,7 +248,6 @@ exports.obtenerPedidosPorUsuario = async (req, res) => {
     console.log(`[Pedido] Pedidos obtenidos para usuario ${idUsuario}: ${pedidos.length}`);
     res.json(pedidos);
   } catch (error) {
-    console.error(`[Pedido] Error al obtener pedidos por usuario | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener los pedidos.' });
+    next(error);
   }
 };

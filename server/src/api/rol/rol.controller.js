@@ -4,7 +4,7 @@ const Logs = require("../logs/log.model");
 const axios = require("axios");
 
 // GET ALL ROLES
-exports.getAllRoles = async (req, res) => {
+exports.getAllRoles = async (req, res, next) => {
   const idUsuario = req.user.id;
   try {
     const roles = await Rol.findAll();
@@ -27,12 +27,12 @@ exports.getAllRoles = async (req, res) => {
       idusuario: idUsuario,
       codigo: 500,
     });
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
 // GET ROL BY ID
-exports.getRolById = async (req, res) => {
+exports.getRolById = async (req, res, next) => {
   const idUsuario = req.user.id;
   const { id } = req.params;
   try {
@@ -59,12 +59,12 @@ exports.getRolById = async (req, res) => {
       idusuario: idUsuario,
       codigo: 500,
     });
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
 // CREATE ROL
-exports.createRol = async (req, res) => {
+exports.createRol = async (req, res, next) => {
   const idUsuario = req.user.id;
   try {
     const {
@@ -99,12 +99,12 @@ exports.createRol = async (req, res) => {
       idusuario: idUsuario,
       codigo: 500,
     });
-    return res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
 // UPDATE ROL
-exports.updateRol = async (req, res) => {
+exports.updateRol = async (req, res, next) => {
   const idUsuario = req.user.id;
   const { id } = req.params;
   const {
@@ -154,12 +154,12 @@ exports.updateRol = async (req, res) => {
       idusuario: idUsuario,
       codigo: 500,
     });
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
 // DELETE ROL
-exports.deleteRol = async (req, res) => {
+exports.deleteRol = async (req, res, next) => {
   const idUsuario = req.user.id;
   const { id } = req.params;
 
@@ -198,6 +198,6 @@ exports.deleteRol = async (req, res) => {
       idusuario: idUsuario,
       codigo: 500,
     });
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };

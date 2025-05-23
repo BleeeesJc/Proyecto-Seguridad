@@ -1,7 +1,7 @@
 const Mesa = require('./mesasModel');
 
 // Obtener todas las mesas visibles
-const obtenerMesa = async (req, res) => {
+const obtenerMesa = async (req, res, next) => {
   console.log('[Mesa] Obtener todas las mesas visibles');
 
   try {
@@ -9,13 +9,12 @@ const obtenerMesa = async (req, res) => {
     console.log(`Mesas obtenidas (${mesas.length} registros)`);
     res.status(200).json(mesas);
   } catch (error) {
-    console.error(`Error al obtener mesas: ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener las actividades' });
+    next(error);
   }
 };
 
 // Obtener una mesa por ID
-const obtenerMesaPorId = async (req, res) => {
+const obtenerMesaPorId = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Mesa] Buscar por ID | ID: ${id}`);
 
@@ -30,13 +29,12 @@ const obtenerMesaPorId = async (req, res) => {
     console.log(`Mesa encontrada | ID: ${id}`);
     res.status(200).json(mesa);
   } catch (error) {
-    console.error(`Error al obtener la mesa | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener la mesa.' });
+    next(error);
   }
 };
 
 // Crear una nueva mesa
-const crearMesa = async (req, res) => {
+const crearMesa = async (req, res, next) => {
   const { nombre, capacidad, posx, posy } = req.body;
   console.log(`[Mesa] Crear | Nombre: ${nombre}, Capacidad: ${capacidad}, Posición: (${posx}, ${posy})`);
 
@@ -45,13 +43,12 @@ const crearMesa = async (req, res) => {
     console.log(`Mesa creada | ID: ${nuevaMesa.idmesa}`);
     res.status(201).json(nuevaMesa);
   } catch (error) {
-    console.error(`Error al crear mesa: ${error.message}`);
-    res.status(500).json({ error: 'Error al crear la Mesa' });
+    next(error);
   }
 };
 
 // Actualizar una mesa existente
-const actualizarMesa = async (req, res) => {
+const actualizarMesa = async (req, res, next) => {
   const { id } = req.params;
   const { capacidad, nombre, posx, posy } = req.body;
   console.log(`🔧 [Mesa] Actualizar | ID: ${id}`);
@@ -73,13 +70,12 @@ const actualizarMesa = async (req, res) => {
     console.log(`Mesa actualizada | ID: ${id}`);
     res.status(200).json(mesa);
   } catch (error) {
-    console.error(`Error al actualizar la mesa | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar la mesa' });
+    next(error);
   }
 };
 
 // Eliminar una mesa
-const borrarMesa = async (req, res) => {
+const borrarMesa = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Mesa] Eliminar | ID: ${id}`);
 
@@ -95,13 +91,12 @@ const borrarMesa = async (req, res) => {
     console.log(`Mesa eliminada con éxito | ID: ${id}`);
     res.status(200).json({ message: 'Mesa eliminada con éxito' });
   } catch (error) {
-    console.error(`Error al eliminar la mesa | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al borrar la mesa' });
+    next(error);
   }
 };
 
 // Cambiar estado visible de una mesa
-const actualizarEstadoMesa = async (req, res) => {
+const actualizarEstadoMesa = async (req, res, next) => {
   const { id } = req.params;
   const { visible } = req.body;
   console.log(`[Mesa] Cambiar visibilidad | ID: ${id} → Visible: ${visible}`);
@@ -120,8 +115,7 @@ const actualizarEstadoMesa = async (req, res) => {
     console.log(`Visibilidad actualizada | ID: ${id}, Visible: ${visible}`);
     res.status(200).json({ message: 'Estado de la mesa actualizado con éxito', mesa });
   } catch (error) {
-    console.error(`Error al actualizar visibilidad | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al actualizar el estado de la mesa' });
+    next(error);
   }
 };
 

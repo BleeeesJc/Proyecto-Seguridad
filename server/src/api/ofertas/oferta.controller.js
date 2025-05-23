@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Crear una nueva oferta
-exports.crearOferta = async (req, res) => {
+exports.crearOferta = async (req, res, next) => {
     try {
         const { titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
         const src = req.file ? req.file.path : null; // Ruta relativa de la imagen
@@ -65,13 +65,12 @@ exports.crearOferta = async (req, res) => {
         console.log('[Oferta] Correos enviados correctamente');
         res.status(201).json({ message: "Oferta creada y correos enviados a los usuarios con rol 1." });
     } catch (error) {
-        console.error(`[Oferta] Error en creación o envío de correos | ${error.message}`);
-        res.status(500).json({ error: "Error al crear la oferta o enviar correos", details: error.message });
+        next(error);
     }
 };
 
 // Obtener todas las ofertas
-exports.obtenerOfertas = async (req, res) => {
+exports.obtenerOfertas = async (req, res, next) => {
     try {
         const ofertas = await sequelize.query(
             `SELECT * FROM oferta`,
@@ -80,13 +79,12 @@ exports.obtenerOfertas = async (req, res) => {
         console.log(`[Oferta] Ofertas obtenidas: ${ofertas.length}`);
         res.json(ofertas);
     } catch (error) {
-        console.error(`[Oferta] Error al obtener las ofertas | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener las ofertas' });
+        next(error);
     }
 };
 
 // Actualizar una oferta
-exports.actualizarOferta = async (req, res) => {
+exports.actualizarOferta = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
@@ -164,20 +162,19 @@ exports.actualizarOferta = async (req, res) => {
             await Promise.all(emailPromises);
             console.log('[Oferta] Correos de actualización enviados');
         } catch (error) {
-            console.error(`[Oferta] Error al enviar correos de actualización | ${mailError.message}`);
+            next(error);
         }
 
         // Envía respuesta de éxito
         return res.json({ message: "Oferta actualizada correctamente y correos enviados." });
     } catch (error) {
-        cconsole.error(`[Oferta] Error al actualizar la oferta | ${error.message}`);
-        return res.status(500).json({ error: "Error interno del servidor" });
+        next(error);
     }
 };
 
 
 // Eliminar una oferta
-exports.eliminarOferta = async (req, res) => {
+exports.eliminarOferta = async (req, res, next) => {
     const { id } = req.params;
     console.log(`[Oferta] Eliminar | ID: ${id}`);
     try {
@@ -198,6 +195,6 @@ exports.eliminarOferta = async (req, res) => {
         }
     } catch (error) {
         console.error(`[Oferta] Error al eliminar la oferta | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar la oferta' });
+        next(error);
     }
 };  

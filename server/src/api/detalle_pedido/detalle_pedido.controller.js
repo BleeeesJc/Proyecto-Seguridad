@@ -1,7 +1,7 @@
 const sequelize = require('../../config/db');
 
 // Crear un nuevo detalle de pedido
-exports.crearDetallePedido = async (req, res) => {
+exports.crearDetallePedido = async (req, res, next) => {
     const { cantidad, idplato, idpedido, idreserva } = req.body;
     console.log(`[DetallePedido] Crear | Plato: ${idplato}, Pedido: ${idpedido}, Reserva: ${idreserva}, Cantidad: ${cantidad}`);
 
@@ -18,13 +18,12 @@ exports.crearDetallePedido = async (req, res) => {
         console.log(`Detalle de pedido creado con éxito | Pedido ID: ${idpedido}`);
         res.status(201).json({ message: 'Detalle de pedido creado exitosamente' });
     } catch (error) {
-        console.error(`Error al crear detalle del pedido | ${error.message}`);
-        res.status(500).json({ error: 'Error al crear el detalle del pedido', details: error.message });
+        next(error);
     }
 };
 
 // Obtener todos los detalles de pedido
-exports.obtenerDetallesPedido = async (req, res) => {
+exports.obtenerDetallesPedido = async (req, res, next) => {
     console.log(`📦 [DetallePedido] Obtener todos`);
 
     try {
@@ -40,13 +39,12 @@ exports.obtenerDetallesPedido = async (req, res) => {
         console.log(`Detalles de pedido obtenidos (${detalles.length} registros)`);
         res.json(detalles);
     } catch (error) {
-        console.error(`Error al obtener detalles de pedido | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener los detalles de pedido' });
+        next(error);
     }
 };
 
 // Actualizar un detalle de pedido
-exports.actualizarDetallePedido = async (req, res) => {
+exports.actualizarDetallePedido = async (req, res, next) => {
     const { id } = req.params;
     const { cantidad, idplato, idpedido, idreserva } = req.body;
     console.log(`🔧 [DetallePedido] Actualizar | ID: ${id}`);
@@ -70,13 +68,12 @@ exports.actualizarDetallePedido = async (req, res) => {
             res.status(404).json({ error: 'Detalle de pedido no encontrado' });
         }
     } catch (error) {
-        console.error(`❌ Error al actualizar detalle del pedido | ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al actualizar el detalle del pedido' });
+        next(error);
     }
 };
 
 // Eliminar un detalle de pedido
-exports.eliminarDetallePedido = async (req, res) => {
+exports.eliminarDetallePedido = async (req, res, next) => {
     const { id } = req.params;
     console.log(`[DetallePedido] Eliminar | ID: ${id}`);
 
@@ -94,13 +91,12 @@ exports.eliminarDetallePedido = async (req, res) => {
             res.status(404).json({ error: 'Detalle de pedido no encontrado' });
         }
     } catch (error) {
-        console.error(`Error al eliminar detalle del pedido | ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar el detalle del pedido' });
+        next(error);
     }
 };
 
 // Obtener detalles por ID de pedido
-exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
+exports.obtenerDetallesPedidoPorPedido = async (req, res, next) => {
     const { pedido } = req.query;
 
     if (!pedido) {
@@ -127,7 +123,6 @@ exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
         console.log(`Detalles por pedido obtenidos | Pedido ID: ${pedido} | Registros: ${detalles.length}`);
         res.json(detalles);
     } catch (error) {
-        console.error(`Error al obtener detalles del pedido | Pedido ID: ${pedido} | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener los detalles del pedido' });
+        next(error);
     }
 };

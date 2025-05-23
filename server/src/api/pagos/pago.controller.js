@@ -1,7 +1,7 @@
 const sequelize = require('../../config/db');
 
 // Controlador: Crear un nuevo pago y actualizar el estado del pedido
-exports.crearPago = async (req, res) => {
+exports.crearPago = async (req, res, next) => {
     const { idpedido, idusuario, monto } = req.body;
     const fecha = new Date();
     console.log(`💳 [Pago] Crear | Pedido: ${idpedido}, Usuario: ${idusuario}, Monto: ${monto}, Fecha: ${fecha.toISOString()}`);
@@ -52,13 +52,12 @@ exports.crearPago = async (req, res) => {
         res.status(201).json({ message: 'Pago creado y pedido actualizado exitosamente' });
     } catch (error) {
         await transaction.rollback();
-        console.error(`[Pago] Error en crearPago | Pedido: ${idpedido} | ${error.message}`);
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
 // Obtener todos los pagos
-exports.obtenerPagos = async (req, res) => {
+exports.obtenerPagos = async (req, res, next) => {
     console.log('[Pago] Obtener todos los pagos');
     try {
         const pagos = await sequelize.query(
@@ -72,13 +71,12 @@ exports.obtenerPagos = async (req, res) => {
         console.log(`[Pago] Pagos obtenidos: ${pagos.length}`);
         res.json(pagos);
     } catch (error) {
-        console.error(`[Pago] Error al obtener los pagos | ${error.message}`);
-        res.status(500).json({ error: 'Error al obtener los pagos' });
+        next(error);
     }
 };
 
 // Actualizar un pago
-exports.actualizarPago = async (req, res) => {
+exports.actualizarPago = async (req, res, next) => {
     const { id } = req.params;
     const { idpedido, idusuario, monto, fecha } = req.body;
     console.log(`[Pago] Actualizar | Pago ID: ${id}, Pedido: ${idpedido}, Usuario: ${idusuario}, Monto: ${monto}`);
@@ -102,13 +100,12 @@ exports.actualizarPago = async (req, res) => {
             res.status(404).json({ error: 'Pago no encontrado' });
         }
     } catch (error) {
-        console.error(`[Pago] Error al actualizar el pago | Pago ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al actualizar el pago' });
+        next(error);
     }
 };
 
 // Eliminar un pago
-exports.eliminarPago = async (req, res) => {
+exports.eliminarPago = async (req, res, next) => {
     const { id } = req.params;
     console.log(`🗑️ [Pago] Eliminar | Pago ID: ${id}`);
 
@@ -126,7 +123,6 @@ exports.eliminarPago = async (req, res) => {
             res.status(404).json({ error: 'Pago no encontrado' });
         }
     } catch (error) {
-        console.error(`[Pago] Error al eliminar el pago | Pago ID: ${id} | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar el pago' });
+        next(error);
     }
 };

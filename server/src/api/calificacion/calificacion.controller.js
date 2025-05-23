@@ -1,7 +1,7 @@
 const sequelize = require('../../config/db');
 
 // Crear una nueva calificación
-exports.crearCalificacion = async (req, res) => {
+exports.crearCalificacion = async (req, res, next) => {
   const { puntuacion, idusuario, idplato } = req.body;
   console.log(`Crear calificación | Usuario: ${idusuario}, Plato: ${idplato}, Puntuación: ${puntuacion}`);
 
@@ -21,13 +21,12 @@ exports.crearCalificacion = async (req, res) => {
       data: nuevaCalificacion[0],
     });
   } catch (error) {
-    console.error(`Error al crear calificación | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
-    res.status(500).json({ error: 'Error al crear la calificación' });
+    next(error);
   }
 };
 
 // Obtener todas las calificaciones
-exports.obtenerCalificaciones = async (req, res) => {
+exports.obtenerCalificaciones = async (req, res, next) => {
   console.log('Obtener todas las calificaciones');
 
   try {
@@ -43,13 +42,12 @@ exports.obtenerCalificaciones = async (req, res) => {
     console.log(`${calificaciones.length} calificaciones obtenidas`);
     res.json(calificaciones);
   } catch (error) {
-    console.error(`Error al obtener calificaciones: ${error.message}`);
-    res.status(500).json({ error: 'Error al obtener las calificaciones' });
+    next(error);
   }
 };
 
 // Actualizar calificación
-exports.actualizarCalificacion = async (req, res) => {
+exports.actualizarCalificacion = async (req, res, next) => {
   const { puntuacion, idusuario, idplato } = req.body;
   console.log(`Actualizar calificación | Usuario: ${idusuario}, Plato: ${idplato}, Nueva puntuación: ${puntuacion}`);
 
@@ -72,13 +70,12 @@ exports.actualizarCalificacion = async (req, res) => {
       res.status(404).json({ error: "No se encontró la calificación para actualizar" });
     }
   } catch (error) {
-    console.error(`Error al actualizar calificación | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
-    res.status(500).json({ error: "Error al actualizar la calificación" });
+    next(error);
   }
 };
 
 // Eliminar calificación
-exports.eliminarCalificacion = async (req, res) => {
+exports.eliminarCalificacion = async (req, res, next) => {
   const { id } = req.params;
   console.log(`Eliminar calificación | ID: ${id}`);
 
@@ -99,13 +96,12 @@ exports.eliminarCalificacion = async (req, res) => {
       res.status(404).json({ error: 'Calificación no encontrada' });
     }
   } catch (error) {
-    console.error(`Error al eliminar calificación | ID: ${id} | ${error.message}`);
-    res.status(500).json({ error: 'Error al eliminar la calificación' });
+    next(error);
   }
 };
 
 // Verificar existencia de reseña
-exports.existeResenia = async (req, res) => {
+exports.existeResenia = async (req, res, next) => {
   const { idusuario, idplato } = req.query;
   console.log(`Verificar reseña | Usuario: ${idusuario}, Plato: ${idplato}`);
 
@@ -126,13 +122,12 @@ exports.existeResenia = async (req, res) => {
     console.log(`Verificación completada | Existe: ${reseña.length > 0}`);
     res.json({ existe: reseña.length > 0 });
   } catch (error) {
-    console.error(`Error al verificar reseña | Usuario: ${idusuario}, Plato: ${idplato} | ${error.message}`);
-    res.status(500).json({ error: "Error al verificar la reseña" });
+    next(error);
   }
 };
 
 // Obtener calificaciones por usuario
-exports.obtenerCalificacionesPorUsuario = async (req, res) => {
+exports.obtenerCalificacionesPorUsuario = async (req, res, next) => {
   const { idusuario } = req.params;
   console.log(`Obtener calificaciones del usuario | ID: ${idusuario}`);
 
@@ -155,13 +150,12 @@ exports.obtenerCalificacionesPorUsuario = async (req, res) => {
     console.log(`Calificaciones del usuario ${idusuario} obtenidas: ${calificaciones.length}`);
     res.json(calificaciones);
   } catch (error) {
-    console.error(`Error al obtener calificaciones del usuario ${idusuario}: ${error.message}`);
-    res.status(500).json({ error: "Error al obtener las calificaciones del usuario." });
+    next(error);
   }
 };
 
 
-exports.calificarExperiencia = async (req, res) => {
+exports.calificarExperiencia = async (req, res, next) => {
   const { puntuacion, idusuario, fecha } = req.body;
   console.log(`Calificar experiencia | Usuario: ${idusuario}, Fecha: ${fecha}, Puntuación: ${puntuacion}`);
 
@@ -181,7 +175,6 @@ exports.calificarExperiencia = async (req, res) => {
       data: nuevaCalificacion[0],
     });
   } catch (error) {
-    console.error(`Error al calificar experiencia | Usuario: ${idusuario} | ${error.message}`);
-    res.status(500).json({ error: 'Error al calificar la experiencia' });
+    next(error);
   }
 };
