@@ -57,6 +57,7 @@ export default {
         pedidocliente: false,
         mapacliente: false,
         menucliente: false,
+        logs: false
       },
       permisos: [
         { key: "asignacionroles", label: "Asignación de Roles" },
@@ -71,6 +72,7 @@ export default {
         { key: "platillos", label: "Platillos" },
         { key: "reservas", label: "Reservas" },
         { key: "usuarios", label: "Usuarios" },
+        { key: "logs", label: "Logs" },
       ],
       successModalVisible: false,
       successMensaje: "",
@@ -87,10 +89,14 @@ export default {
       this.nuevoRol.rol = nombre;
 
       try {
+        const token = localStorage.getItem("token");
         const response = await axios.post(
           "http://localhost:5000/api/rol",
-          this.nuevoRol
-        );
+          this.nuevoRol, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.$emit("rol-creado", response.data);
         this.mostrarSuccessModal("Rol creado correctamente");
         this.resetForm();

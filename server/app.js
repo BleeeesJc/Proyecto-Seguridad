@@ -81,7 +81,9 @@ const dashboardRoutes = require('./src/api/dashboard/dashboard.routes');
 const rolRoutes = require('./src/api/rol/rol.routes');
 const platillosRoutes = require('./src/api/platillos/platillo.routes');
 const calificacionRoutes = require('./src/api/calificacion/calificacion.routes');
+const logRouters = require('./src/api/logs/log.routes')
 
+app.use('/api/platillos', platillosRoutes);
 app.use('/api/ofertas', ofertasRoutes);
 app.use('/api/rol', rolRoutes);
 app.use('/api/platillos', platillosRoutes);
@@ -96,6 +98,7 @@ app.use('/api/detalle_pedido', detalle_pedidoRoutes);
 app.use('/api/pagos', pagosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/calificaciones', calificacionRoutes);
+app.use('/api/log', logRouters);
 
 // Archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

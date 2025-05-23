@@ -34,7 +34,8 @@ export default {
         { to: "/panelAdministrativo/platillos", label: "Platillos", permiso: "platillos" },
         { to: "/panelAdministrativo/pedidosadmin", label: "Pedidos", permiso: "pedidos" },
         { to: "/panelAdministrativo/reservas", label: "Reservas", permiso: "reservas" },
-        { to: "/panelAdministrativo/mapa", label: "Mapa Interactivo", permiso: "mapainteractivo" }
+        { to: "/panelAdministrativo/mapa", label: "Mapa Interactivo", permiso: "mapainteractivo" },
+        { to: "/panelAdministrativo/logs", label: "Logs del Sistema", permiso: "logs" }
       ]
     };
   },
