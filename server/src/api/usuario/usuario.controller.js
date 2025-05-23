@@ -1,14 +1,14 @@
 // src/api/usuario.controller.js
-const sequelize = require('../../config/db');
-const emailExistence = require('email-existence');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
-const HistoricoContrasenas = require('../historico_contrasenas/historico_contrasenas.model');
+const sequelize = require("../../config/db");
+const emailExistence = require("email-existence");
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
+const HistoricoContrasenas = require("../historico_contrasenas/historico_contrasenas.model");
 
 const verificationCodes = {}; // temporal
 
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  service: "Gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -16,11 +16,12 @@ const transporter = nodemailer.createTransport({
   tls: { rejectUnauthorized: false },
 });
 
-
 // Crear un nuevo usuario
-exports.registrarUsuario = async (req, res) => {
+exports.registrarUsuario = async (req, res, next) => {
   const { nombre, apellidos, email, password, idrol } = req.body;
-  console.log(`[Usuario] Registrar | ${nombre} ${apellidos}, email: ${email}, rol recibido: ${idrol}`);
+  console.log(
+    `[Usuario] Registrar | ${nombre} ${apellidos}, email: ${email}, rol recibido: ${idrol}`
+  );
 
   try {
     let rolId = idrol;
@@ -34,12 +35,16 @@ exports.registrarUsuario = async (req, res) => {
     }
 
     if (!rolId) {
-      console.error('[Usuario] No se pudo determinar rol válido');
-      return res.status(500).json({ message: "No se pudo determinar un rol válido para el usuario" });
+      console.error("[Usuario] No se pudo determinar rol válido");
+      return res
+        .status(500)
+        .json({
+          message: "No se pudo determinar un rol válido para el usuario",
+        });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('[Usuario] Contraseña hasheada');
+    console.log("[Usuario] Contraseña hasheada");
     await sequelize.query(
       `INSERT INTO usuario (nombre, apellidos, correo, password, idrol)
        VALUES (:nombre, :apellidos, :email, :password, :idrol)`,
@@ -49,24 +54,26 @@ exports.registrarUsuario = async (req, res) => {
           apellidos,
           email,
           password: hashedPassword,
-          idrol: rolId
+          idrol: rolId,
         },
         type: sequelize.QueryTypes.INSERT,
       }
     );
 
     console.log(`[Usuario] Registrado exitosamente | rol: ${rolId}`);
-    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+    res.status(201).json({ message: "Usuario registrado exitosamente" });
   } catch (error) {
     next(error);
   }
 };
 
 // Actualizar solo el rol de un usuario
-exports.actualizarRolUsuario = async (req, res) => {
+exports.actualizarRolUsuario = async (req, res, next) => {
   const { id } = req.params;
   const { idRol } = req.body;
-  console.log(`[Usuario] Actualizar rol | idUsuario: ${id}, nuevo rol: ${idRol}`);
+  console.log(
+    `[Usuario] Actualizar rol | idUsuario: ${id}, nuevo rol: ${idRol}`
+  );
 
   try {
     const [actualizado] = await sequelize.query(
@@ -74,21 +81,25 @@ exports.actualizarRolUsuario = async (req, res) => {
       { replacements: { id, idRol }, type: sequelize.QueryTypes.UPDATE }
     );
     if (!actualizado) {
-      console.warn(`[Usuario] No encontrado para actualizar rol | idUsuario: ${id}`);
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      console.warn(
+        `[Usuario] No encontrado para actualizar rol | idUsuario: ${id}`
+      );
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
     console.log(`[Usuario] Rol actualizado | idUsuario: ${id}`);
-    res.json({ message: 'Rol del usuario actualizado exitosamente' });
+    res.json({ message: "Rol del usuario actualizado exitosamente" });
   } catch (error) {
     next(error);
   }
 };
 
 // Obtener todos los usuarios
-exports.obtenerUsuarios = async (req, res) => {
-  console.log('[Usuario] Obtener todos');
+exports.obtenerUsuarios = async (req, res, next) => {
+  console.log("[Usuario] Obtener todos");
   try {
-    const usuarios = await sequelize.query(`SELECT * FROM usuario`, { type: sequelize.QueryTypes.SELECT });
+    const usuarios = await sequelize.query(`SELECT * FROM usuario`, {
+      type: sequelize.QueryTypes.SELECT,
+    });
     console.log(`[Usuario] Usuarios obtenidos: ${usuarios.length}`);
     res.json(usuarios);
   } catch (error) {
@@ -97,7 +108,7 @@ exports.obtenerUsuarios = async (req, res) => {
 };
 
 //Obtener todos los usuarios de un rol en especifico
-exports.obtenerUsuariosPorRol = async (req, res) => {
+exports.obtenerUsuariosPorRol = async (req, res, next) => {
   const { rol } = req.params;
   console.log(`[Usuario] Obtener por rol | rol: ${rol}`);
   try {
@@ -112,9 +123,8 @@ exports.obtenerUsuariosPorRol = async (req, res) => {
   }
 };
 
-
 // Obtener un único usuario por ID
-exports.obtenerUsuarioPorId = async (req, res) => {
+exports.obtenerUsuarioPorId = async (req, res, next) => {
   const { id } = req.params;
   console.log(`🔍 [Usuario] Obtener por ID | idUsuario: ${id}`);
   try {
@@ -131,7 +141,7 @@ exports.obtenerUsuarioPorId = async (req, res) => {
       res.json(usuario[0]);
     } else {
       console.warn(`[Usuario] No encontrado | idUsuario: ${id}`);
-      res.status(404).json({ error: 'Usuario no encontrado' });
+      res.status(404).json({ error: "Usuario no encontrado" });
     }
   } catch (error) {
     next(error);
@@ -139,7 +149,7 @@ exports.obtenerUsuarioPorId = async (req, res) => {
 };
 
 // Actualizar un usuario
-exports.actualizarUsuario = async (req, res) => {
+exports.actualizarUsuario = async (req, res, next) => {
   const { id } = req.params;
   const { nombre, apellidos, correo, password, idRol } = req.body;
   console.log(`[Usuario] Actualizar | idUsuario: ${id}`);
@@ -156,10 +166,12 @@ exports.actualizarUsuario = async (req, res) => {
 
     if (actualizado) {
       console.log(`[Usuario] Actualizado | idUsuario: ${id}`);
-      res.json({ message: 'Usuario actualizado exitosamente' });
+      res.json({ message: "Usuario actualizado exitosamente" });
     } else {
-      console.warn(`[Usuario] No encontrado para actualizar | idUsuario: ${id}`);
-      res.status(404).json({ error: 'Usuario no encontrado' });
+      console.warn(
+        `[Usuario] No encontrado para actualizar | idUsuario: ${id}`
+      );
+      res.status(404).json({ error: "Usuario no encontrado" });
     }
   } catch (error) {
     next(error);
@@ -167,7 +179,7 @@ exports.actualizarUsuario = async (req, res) => {
 };
 
 // Obtener un usuario por su correo
-exports.obtenerUsuarioPorCorreo = async (req, res) => {
+exports.obtenerUsuarioPorCorreo = async (req, res, next) => {
   const { correo } = req.params;
   console.log(`[Usuario] Obtener por correo | correo: ${correo}`);
   try {
@@ -177,7 +189,7 @@ exports.obtenerUsuarioPorCorreo = async (req, res) => {
     );
     if (usuario.length === 0) {
       console.warn(`[Usuario] No encontrado por correo | ${correo}`);
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
     console.log(`[Usuario] Encontrado por correo | ${correo}`);
     res.json(usuario[0]);
@@ -187,7 +199,7 @@ exports.obtenerUsuarioPorCorreo = async (req, res) => {
 };
 
 // Actualizar contraseña con validación de histórico
-exports.actualizarContrasena = async (req, res) => {
+exports.actualizarContrasena = async (req, res, next) => {
   const { id } = req.params;
   const { newPassword } = req.body;
 
@@ -195,7 +207,7 @@ exports.actualizarContrasena = async (req, res) => {
 
   try {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    console.log('[Usuario] Nueva contraseña hasheada');
+    console.log("[Usuario] Nueva contraseña hasheada");
     const [usuarioActual] = await sequelize.query(
       `SELECT password FROM usuario WHERE idusuario = :id`,
       {
@@ -205,33 +217,42 @@ exports.actualizarContrasena = async (req, res) => {
     );
 
     if (!usuarioActual) {
-      console.warn(`[Usuario] No encontrado al buscar contraseña actual | idUsuario: ${id}`);
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+      console.warn(
+        `[Usuario] No encontrado al buscar contraseña actual | idUsuario: ${id}`
+      );
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
     const passwordActual = usuarioActual.password;
     const esMismaActual = await bcrypt.compare(newPassword, passwordActual);
     if (esMismaActual) {
-      console.warn('[Usuario] Contraseña nueva igual a la actual');
-      return res.status(400).json({ message: 'No puedes usar tu contraseña actual nuevamente.' });
+      console.warn("[Usuario] Contraseña nueva igual a la actual");
+      return res
+        .status(400)
+        .json({ message: "No puedes usar tu contraseña actual nuevamente." });
     }
     const historicos = await HistoricoContrasenas.findAll({
-      where: { idusuario: id }
+      where: { idusuario: id },
     });
 
     for (const registro of historicos) {
       const coincide = await bcrypt.compare(newPassword, registro.password);
       if (coincide) {
-        console.warn('[Usuario] Contraseña ya usada anteriormente');
-        return res.status(400).json({ message: 'No puedes usar una contraseña que ya hayas usado anteriormente.' });
+        console.warn("[Usuario] Contraseña ya usada anteriormente");
+        return res
+          .status(400)
+          .json({
+            message:
+              "No puedes usar una contraseña que ya hayas usado anteriormente.",
+          });
       }
     }
     await HistoricoContrasenas.create({
       idusuario: id,
       password: passwordActual,
-      fecha_cambio: new Date()
+      fecha_cambio: new Date(),
     });
-    console.log('[Usuario] Contraseña anterior guardada en histórico');
+    console.log("[Usuario] Contraseña anterior guardada en histórico");
     await sequelize.query(
       `UPDATE usuario SET password = :password WHERE idusuario = :id`,
       {
@@ -239,16 +260,15 @@ exports.actualizarContrasena = async (req, res) => {
         type: sequelize.QueryTypes.UPDATE,
       }
     );
-    console.log('[Usuario] Contraseña actualizada');
-    res.json({ message: 'Contraseña actualizada exitosamente' });
+    console.log("[Usuario] Contraseña actualizada");
+    res.json({ message: "Contraseña actualizada exitosamente" });
   } catch (error) {
     next(error);
   }
 };
 
-
 // Eliminar un usuario
-exports.eliminarUsuario = async (req, res) => {
+exports.eliminarUsuario = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Usuario] Eliminar | idUsuario: ${id}`);
   try {
@@ -258,7 +278,7 @@ exports.eliminarUsuario = async (req, res) => {
     );
     if (!eliminado) {
       console.warn(`[Usuario] No encontrado para eliminar | idUsuario: ${id}`);
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
     console.log(`[Usuario] Usuario eliminado | idUsuario: ${id}`);
     res.status(204).json();
@@ -267,9 +287,7 @@ exports.eliminarUsuario = async (req, res) => {
   }
 };
 
-
-
-exports.autenticarUsuario = async (req, res) => {
+exports.autenticarUsuario = async (req, res, next) => {
   const { email, password } = req.body;
   console.log(`[Auth] Intento login | email: ${email}`); // Depuración
 
@@ -279,58 +297,76 @@ exports.autenticarUsuario = async (req, res) => {
       { replacements: { email }, type: sequelize.QueryTypes.SELECT }
     );
 
-    console.log('[Auth] Usuario encontrado:', usuario); // Depuración
+    console.log("[Auth] Usuario encontrado:", usuario); // Depuración
 
     // Paso 2: Verificar si el usuario existe
     if (!usuario) {
       cconsole.warn(`⚠️ [Auth] Usuario no encontrado | email: ${email}`); // Depuración
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Usuario no encontrado" });
     }
 
     // Paso 3: Verificar la contraseña
     const passwordCorrecta = await bcrypt.compare(password, usuario.password);
     if (!passwordCorrecta) {
       console.warn(`[Auth] Contraseña incorrecta | email: ${email}`); // Depuración
-      return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+      return res
+        .status(401)
+        .json({ success: false, message: "Contraseña incorrecta" });
     }
 
     // Paso 4: Autenticación exitosa
-    console.log('[Auth] Autenticación exitosa'); // Depuración
+    console.log("[Auth] Autenticación exitosa"); // Depuración
     return res.status(200).json({
       success: true,
-      message: 'Inicio de sesión exitoso',
-      user: { id: usuario.idusuario, email: usuario.correo, rol: usuario.idrol }
+      message: "Inicio de sesión exitoso",
+      user: {
+        id: usuario.idusuario,
+        email: usuario.correo,
+        rol: usuario.idrol,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-
-exports.enviarCodigo = (req, res) => {
+exports.enviarCodigo = (req, res, next) => {
   const { email } = req.body;
   console.log(`[Auth] Enviar código | email: ${email}`);
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(email)) {
-    console.warn('[Auth] Formato de correo inválido');
+    console.warn("[Auth] Formato de correo inválido");
     return res.status(400).json({
       success: false,
-      message: 'Formato de correo inválido.',
+      message: "Formato de correo inválido.",
     });
   }
 
   emailExistence.check(email, async (err, exists) => {
     if (err) {
-      console.error(`[Auth] Error al verificar existencia de email | ${err.message}`);
-      return res.status(500).json({ success: false, message: 'No fue posible verificar el correo.' });
+      console.error(
+        `[Auth] Error al verificar existencia de email | ${err.message}`
+      );
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "No fue posible verificar el correo.",
+        });
     }
     if (!exists) {
       console.warn(`[Auth] Email no existe o inaccesible | email: ${email}`);
-      return res.status(404).json({ success: false, message: 'El correo no existe o no se puede alcanzar.' });
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "El correo no existe o no se puede alcanzar.",
+        });
     }
 
     try {
-
       const verificationCode = Math.floor(100000 + Math.random() * 900000);
       verificationCodes[email] = verificationCode;
       console.log(`[Auth] Código generado | ${verificationCode}`);
@@ -338,20 +374,19 @@ exports.enviarCodigo = (req, res) => {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
-        subject: 'Código de verificación',
+        subject: "Código de verificación",
         text: `Tu código de verificación es: ${verificationCode}`,
       });
 
       console.log(`[Auth] Código enviado por email | email: ${email}`);
-      res.json({ success: true, message: 'Código de verificación enviado.' });
+      res.json({ success: true, message: "Código de verificación enviado." });
     } catch (error) {
       next(error);
     }
   });
 };
 
-
-exports.enviarConfirmacionPedido = async (req, res) => {
+exports.enviarConfirmacionPedido = async (req, res, next) => {
   const { idUsuario, detalles, precio_total } = req.body;
   console.log(`[Pedido] Enviar confirmación | idUsuario: ${idUsuario}`);
   try {
@@ -366,7 +401,9 @@ exports.enviarConfirmacionPedido = async (req, res) => {
 
     if (usuario.length === 0) {
       console.warn(`[Pedido] Usuario no encontrado | idUsuario: ${idUsuario}`);
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Usuario no encontrado" });
     }
 
     const email = usuario[0].correo; // Extrae el email del usuario
@@ -387,7 +424,7 @@ exports.enviarConfirmacionPedido = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Confirmación de Pedido',
+      subject: "Confirmación de Pedido",
       html: `
         <h1>Pedido Confirmado</h1>
         <p>Gracias por realizar tu pedido. Ya estamos trabajando en él.</p>
@@ -413,30 +450,37 @@ exports.enviarConfirmacionPedido = async (req, res) => {
     await transporter.sendMail(mailOptions);
 
     console.log(`[Pedido] Confirmación enviada | email: ${email}`);
-    res.json({ success: true, message: 'Correo de confirmación enviado' });
+    res.json({ success: true, message: "Correo de confirmación enviado" });
   } catch (error) {
     next(error);
   }
 };
 
-exports.verificarCodigo = async (req, res) => {
+exports.verificarCodigo = async (req, res, next) => {
   const { email, code } = req.body;
-  console.log(`[Auth] Verificar código | email: ${email}, código enviado: ${code}`);
+  console.log(
+    `[Auth] Verificar código | email: ${email}, código enviado: ${code}`
+  );
   try {
-    if (verificationCodes[email] && verificationCodes[email].toString() === code) {
+    if (
+      verificationCodes[email] &&
+      verificationCodes[email].toString() === code
+    ) {
       delete verificationCodes[email];
-      console.log('[Auth] Código verificado correctamente'); // Limpia el código después de la verificación
-      res.json({ success: true, message: 'Código verificado correctamente' });
+      console.log("[Auth] Código verificado correctamente"); // Limpia el código después de la verificación
+      res.json({ success: true, message: "Código verificado correctamente" });
     } else {
-      console.warn('[Auth] Código incorrecto');
-      res.status(400).json({ success: false, message: 'Código de verificación incorrecto' });
+      console.warn("[Auth] Código incorrecto");
+      res
+        .status(400)
+        .json({ success: false, message: "Código de verificación incorrecto" });
     }
   } catch (error) {
     next(error);
   }
 };
 
-exports.enviarReserva = async (req, res) => {
+exports.enviarReserva = async (req, res, next) => {
   const { email, nombre, fecha, hora, mesa } = req.body;
   console.log(`[Reserva] Enviar confirmación | email: ${email}, mesa: ${mesa}`);
   try {
@@ -464,18 +508,30 @@ exports.enviarReserva = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Confirmación de Reserva',
+      subject: "Confirmación de Reserva",
       html: htmlContent,
     };
 
     await transporter.sendMail(mailOptions);
 
-    console.log(`[Reserva] Confirmación enviada | email: ${email}`);
-    res.json({ success: true, message: 'Correo de confirmación enviado' });
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`[Pedido] Confirmación enviada | email: ${email}`);
+      return res.json({
+        success: true,
+        message: "Correo de confirmación enviado",
+      });
+    } catch (err) {
+      console.error(
+        `[Pedido] Error enviando correo: ${err.code} – ${err.response}`
+      );
+      return res.status(500).json({
+        success: false,
+        message:
+          "No se pudo enviar el correo: límite diario excedido en Gmail.",
+      });
+    }
   } catch (error) {
     next(error);
   }
 };
-
-
-
