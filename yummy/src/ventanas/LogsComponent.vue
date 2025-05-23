@@ -6,6 +6,24 @@
       subtitle="Visualiza los registros de actividad" 
     />
 
+    <!-- Filtros -->
+    <div class="filters">
+      <label>
+        Origen:
+        <select v-model="filterOrigen">
+          <option value="">Todos</option>
+          <option value="usuario">Usuario</option>
+          <option value="sistema">Sistema</option>
+        </select>
+      </label>
+      <label>
+        Código:
+        <input type="number" v-model="filterCodigo" placeholder="e.g. 200" />
+      </label>
+      <button @click="obtenerLogs">Aplicar filtros</button>
+      <button @click="resetFiltros">Limpiar filtros</button>
+    </div>
+
     <div class="table-container">
       <table class="table">
         <thead>
@@ -58,6 +76,9 @@ export default {
       logs: [],
       successModalVisible: false,
       successMensaje: '',
+      // filtros
+      filterOrigen: '',
+      filterCodigo: '',
     };
   },
   mounted() {
@@ -67,9 +88,16 @@ export default {
     async obtenerLogs() {
       try {
         const token = localStorage.getItem('token');
+        const params = {};
+        if (this.filterOrigen) params.origen = this.filterOrigen;
+        if (this.filterCodigo) params.codigo = this.filterCodigo;
+
         const { data } = await axios.get(
           'http://localhost:5000/api/log',
-          { headers: { Authorization: `Bearer ${token}` } }
+          { 
+            headers: { Authorization: `Bearer ${token}` },
+            params,
+          }
         );
         this.logs = data;
       } catch (error) {
@@ -78,16 +106,16 @@ export default {
         this.successModalVisible = true;
       }
     },
+    resetFiltros() {
+      this.filterOrigen = '';
+      this.filterCodigo = '';
+      this.obtenerLogs();
+    },
     formatFecha(fecha) {
-      // 1) Si no hay valor, devolvemos vacío o 'N/A'
       if (!fecha) return '';
-
-      // 2) Parseamos según tipo
       const date = typeof fecha === 'string'
         ? parseISO(fecha)
         : new Date(fecha);
-
-      // 3) Validamos
       if (!isValid(date)) {
         console.warn('Fecha inválida en log:', fecha);
         return '';
@@ -100,6 +128,32 @@ export default {
 </script>
 
 <style scoped>
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  align-items: center;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+
+.filters button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #3490dc;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filters button:hover {
+  background-color: #2779bd;
+}
+
 .table-container {
   overflow-x: auto;
   margin: 20px 0;
@@ -107,18 +161,18 @@ export default {
 
 .table {
   width: 100%;
-  table-layout: fixed; /* columnas de ancho fijo */
+  table-layout: fixed; 
 }
 
 .table th,
 .table td {
   padding: 8px;
   border: 1px solid #ddd;
-  white-space: normal;     /* permitir saltos de línea */
-  word-wrap: break-word;   /* romper palabras largas */
-  word-break: break-word;  /* compatibilidad */
-  text-align: center;      /* ¡centrar texto! */
-  vertical-align: middle;  /* centrar verticalmente si hay varias líneas */
+  white-space: normal;     
+  word-wrap: break-word;   
+  word-break: break-word;  
+  text-align: center;      
+  vertical-align: middle;  
 }
 
 .table th {

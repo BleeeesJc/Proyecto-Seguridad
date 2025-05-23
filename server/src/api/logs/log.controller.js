@@ -1,6 +1,6 @@
 // controllers/logController.js
 const { Op } = require('sequelize');
-const Log = require('./log.model'); 
+const Log = require('./log.model');
 
 exports.getAllLogs = async (req, res) => {
   try {
@@ -9,6 +9,8 @@ exports.getAllLogs = async (req, res) => {
       limit = 50,
       accion,
       medio,
+      origen,
+      codigo,
       fechaDesde,
       fechaHasta,
       idusuario,
@@ -17,6 +19,8 @@ exports.getAllLogs = async (req, res) => {
     const where = {};
     if (accion)    where.accion    = { [Op.iLike]: `%${accion}%` };
     if (medio)     where.medio     = { [Op.iLike]: `%${medio}%` };
+    if (origen)    where.origen    = { [Op.iLike]: `%${origen}%` };
+    if (codigo)    where.codigo    = codigo;
     if (idusuario) where.idusuario = idusuario;
     if (fechaDesde || fechaHasta) {
       where.fecha = {};
@@ -26,21 +30,19 @@ exports.getAllLogs = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    // findAndCountAll te sigue dando count si lo necesitas, pero aquí sólo devolvemos rows
-    const { rows: logs /*, count*/ } = await Log.findAndCountAll({
+    const { rows: logs } = await Log.findAndCountAll({
       where,
       order: [['fecha', 'DESC']],
       limit: +limit,
       offset,
     });
 
-    // Ahora devolvemos directamente el array de logs
     res.json(logs);
   } catch (error) {
     console.error('Error al obtener logs:', error);
     res.status(500).json({ message: 'Error al obtener los registros' });
   }
-}
+};
 
 exports.getLogById = async (req, res) => {
   try {
@@ -61,7 +63,6 @@ exports.getLogById = async (req, res) => {
 exports.createLog = async (req, res) => {
   try {
     const { accion, medio, origen, idusuario, codigo } = req.body;
-    // validaciones básicas
     if (!accion || !medio || !origen || !codigo) {
       return res
         .status(400)

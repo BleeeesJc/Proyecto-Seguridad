@@ -48,8 +48,8 @@ const login = async (req, res) => {
       accion: "Intento de Inicio de Sesion mediante correo",
       medio: "El usuario esta ingresando su correo",
       fecha: new Date(),
-      origen: "usuario",
-      idusuario: user.idusuario,
+      origen: "sistema",
+      idusuario: user ? user.idusuario : null,
       codigo: 100,
     });
 
@@ -60,6 +60,7 @@ const login = async (req, res) => {
         medio: "login",
         fecha: new Date(),
         origen: "sistema",
+        idusuario: null,
         codigo: 401,
       });
       return res.status(401).json({ message: "Usuario no encontrado" });
@@ -74,6 +75,7 @@ const login = async (req, res) => {
         medio: "login",
         fecha: new Date(),
         origen: "sistema",
+        idusuario: user.idusuario,
         codigo: 401,
       });
       return res.status(401).json({ message: "Contraseña incorrecta" });
@@ -95,10 +97,10 @@ const login = async (req, res) => {
       accion: `Login exitoso para usuario ID ${user.idusuario} (correo "${user.correo}")`,
       medio: "login",
       fecha: new Date(),
-      origen: "usuario",
+      origen: "sistema",
       idusuario: user.idusuario,
       codigo: 200,
-    });;
+    });
 
     console.log("[Auth] Usuario autenticado:", {
       idusuario: user.idusuario,

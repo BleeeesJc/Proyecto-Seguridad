@@ -20,10 +20,11 @@ exports.getAllRoles = async (req, res) => {
   } catch (error) {
     console.error('Error fetching roles:', error);
     await Logs.create({
-      accion: `Error del sistema al extraer todos los roles`,
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al extraer todos los roles: ${error.message}`,
       medio: "rol",
       fecha: new Date(),
       origen: "sistema",
+      idusuario: idUsuario,
       codigo: 500,
     });
     res.status(500).json({ message: 'Internal server error' });
@@ -32,15 +33,17 @@ exports.getAllRoles = async (req, res) => {
 
 // GET ROL BY ID
 exports.getRolById = async (req, res) => {
+  const idUsuario = req.user.id;
   const { id } = req.params;
   try {
     const rol = await Rol.findByPk(id);
     if (!rol) {
       await Logs.create({
-        accion: `Rol con id ${id} no encontrado al buscar por ID`,
+        accion: `El usuario ${idUsuario} intentó buscar rol con id ${id}, pero no fue encontrado`,
         medio: "rol",
         fecha: new Date(),
         origen: "sistema",
+        idusuario: idUsuario,
         codigo: 404,
       });
       return res.status(404).json({ message: 'Rol not found' });
@@ -49,10 +52,11 @@ exports.getRolById = async (req, res) => {
   } catch (error) {
     console.error('Error fetching rol:', error);
     await Logs.create({
-      accion: `Error del sistema al buscar rol por ID: ${id}`,
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al buscar rol por ID ${id}: ${error.message}`,
       medio: "rol",
       fecha: new Date(),
       origen: "sistema",
+      idusuario: idUsuario,
       codigo: 500,
     });
     res.status(500).json({ message: 'Internal server error' });
@@ -66,13 +70,13 @@ exports.createRol = async (req, res) => {
     const {
       rol, asignacionroles, dashboard, ofertas, usuarios,
       platillos, pedidos, reservas, mapainteractivo,
-      ofertacliente, pedidocliente, mapacliente, menucliente,logs
+      ofertacliente, pedidocliente, mapacliente, menucliente, logs
     } = req.body;
 
     const newRol = await Rol.create({
       rol, asignacionroles, dashboard, ofertas, usuarios,
       platillos, pedidos, reservas, mapainteractivo,
-      ofertacliente, pedidocliente, mapacliente, menucliente,logs
+      ofertacliente, pedidocliente, mapacliente, menucliente, logs
     });
 
     await Logs.create({
@@ -86,12 +90,13 @@ exports.createRol = async (req, res) => {
 
     return res.status(201).json(newRol);
   } catch (error) {
-    console.error(`[Rol] Error creating rol`);
+    console.error('[Rol] Error creating rol:', error);
     await Logs.create({
-      accion: `Error del sistema al crear un nuevo rol con nombre "${req.body.rol}"`,
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al crear un nuevo rol "${req.body.rol}": ${error.message}`,
       medio: "rol",
       fecha: new Date(),
       origen: "sistema",
+      idusuario: idUsuario,
       codigo: 500,
     });
     return res.status(500).json({ message: 'Internal server error' });
@@ -105,24 +110,25 @@ exports.updateRol = async (req, res) => {
   const {
     rol, asignacionroles, dashboard, ofertas, usuarios,
     platillos, pedidos, reservas, mapainteractivo,
-    ofertacliente, pedidocliente, mapacliente, menucliente,logs
+    ofertacliente, pedidocliente, mapacliente, menucliente, logs
   } = req.body;
 
   try {
     const [updated] = await Rol.update({
       rol, asignacionroles, dashboard, ofertas, usuarios,
       platillos, pedidos, reservas, mapainteractivo,
-      ofertacliente, pedidocliente, mapacliente, menucliente,logs
+      ofertacliente, pedidocliente, mapacliente, menucliente, logs
     }, {
       where: { idrol: id }
     });
 
     if (!updated) {
       await Logs.create({
-        accion: `Error: Rol con ID ${id} no encontrado para actualizar`,
+        accion: `El usuario ${idUsuario} intentó actualizar rol con ID ${id}, pero no fue encontrado`,
         medio: "rol",
         fecha: new Date(),
         origen: "sistema",
+        idusuario: idUsuario,
         codigo: 404,
       });
       return res.status(404).json({ message: 'Rol not found' });
@@ -139,14 +145,15 @@ exports.updateRol = async (req, res) => {
 
     res.status(200).json({ message: 'Rol updated successfully' });
   } catch (error) {
+    console.error('Error updating rol:', error);
     await Logs.create({
-      accion: `Error del sistema al actualizar rol con ID ${id}`,
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al actualizar rol con ID ${id}: ${error.message}`,
       medio: "rol",
       fecha: new Date(),
       origen: "sistema",
+      idusuario: idUsuario,
       codigo: 500,
     });
-    console.error('Error updating rol:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -161,10 +168,11 @@ exports.deleteRol = async (req, res) => {
 
     if (!deleted) {
       await Logs.create({
-        accion: `Rol con ID ${id} no encontrado para eliminar`,
+        accion: `El usuario ${idUsuario} intentó eliminar rol con ID ${id}, pero no fue encontrado`,
         medio: "rol",
         fecha: new Date(),
         origen: "sistema",
+        idusuario: idUsuario,
         codigo: 404,
       });
       return res.status(404).json({ message: 'Rol not found' });
@@ -181,14 +189,15 @@ exports.deleteRol = async (req, res) => {
 
     res.status(200).json({ message: 'Rol deleted successfully' });
   } catch (error) {
+    console.error('Error deleting rol:', error);
     await Logs.create({
-      accion: `Error del sistema al eliminar rol con ID ${id}`,
+      accion: `El usuario ${idUsuario} tuvo un error en el sistema al eliminar rol con ID ${id}: ${error.message}`,
       medio: "rol",
       fecha: new Date(),
       origen: "sistema",
+      idusuario: idUsuario,
       codigo: 500,
     });
-    console.error('Error deleting rol:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
