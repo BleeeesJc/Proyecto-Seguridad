@@ -2,7 +2,7 @@
 const sequelize = require('../../config/db');
 
 // Crear un nuevo platillo
-exports.crearPlatillo = async (req, res) => {
+exports.crearPlatillo = async (req, res, next) => {
   const { nombre, descripcion, precio, idCategoria, imagenExterna } = req.body;
   const imagen = req.file
     ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
@@ -28,7 +28,7 @@ exports.crearPlatillo = async (req, res) => {
 };
 
 // Obtener todos los platillos
-exports.obtenerPlatillos = async (req, res) => {
+exports.obtenerPlatillos = async (req, res, next) => {
   console.log('[Platillo] Obtener todos (estado != 0)');
   try {
     const platillos = await sequelize.query(
@@ -43,7 +43,7 @@ exports.obtenerPlatillos = async (req, res) => {
 };
 
 // Actualizar un platillo
-exports.actualizarPlatillo = async (req, res) => {
+exports.actualizarPlatillo = async (req, res, next) => {
   const { id } = req.params;
   const { nombre, descripcion, precio, idCategoria, imagen } = req.body;
   console.log(`[Platillo] Actualizar | ID: ${id}, Nombre: "${nombre}"`);
@@ -72,7 +72,7 @@ exports.actualizarPlatillo = async (req, res) => {
 };
 
 // Eliminar un platillo
-exports.eliminarPlatillo = async (req, res) => {
+exports.eliminarPlatillo = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Platillo] Eliminar | ID: ${id}`);
 
@@ -98,7 +98,7 @@ exports.eliminarPlatillo = async (req, res) => {
 };
 
 // Cambiar el estado de un platillo a "desactivado" (de 1 a 0)
-exports.cambiarDesactivado = async (req, res) => {
+exports.cambiarDesactivado = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Platillo] Desactivar | ID: ${id}`);
 
@@ -124,7 +124,7 @@ exports.cambiarDesactivado = async (req, res) => {
 };
 
 // Cambiar el estado de un platillo entre destacado (2) y no destacado (1)
-exports.toggleDestacado = async (req, res) => {
+exports.toggleDestacado = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Platillo] Toggle destacado | ID: ${id}`);
 
@@ -166,7 +166,7 @@ exports.toggleDestacado = async (req, res) => {
 };
 
 // Obtener platillos con sus ofertas
-exports.obtenerPlatillosOfertas = async (req, res) => {
+exports.obtenerPlatillosOfertas = async (req, res, next) => {
   console.log('[Platillo] Obtener con ofertas');
   try {
     const platillos = await sequelize.query(

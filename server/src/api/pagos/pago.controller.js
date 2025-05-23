@@ -1,7 +1,7 @@
 const sequelize = require('../../config/db');
 
 // Controlador: Crear un nuevo pago y actualizar el estado del pedido
-exports.crearPago = async (req, res) => {
+exports.crearPago = async (req, res, next) => {
     const { idpedido, idusuario, monto } = req.body;
     const fecha = new Date();
     console.log(`💳 [Pago] Crear | Pedido: ${idpedido}, Usuario: ${idusuario}, Monto: ${monto}, Fecha: ${fecha.toISOString()}`);
@@ -57,7 +57,7 @@ exports.crearPago = async (req, res) => {
 };
 
 // Obtener todos los pagos
-exports.obtenerPagos = async (req, res) => {
+exports.obtenerPagos = async (req, res, next) => {
     console.log('[Pago] Obtener todos los pagos');
     try {
         const pagos = await sequelize.query(
@@ -76,7 +76,7 @@ exports.obtenerPagos = async (req, res) => {
 };
 
 // Actualizar un pago
-exports.actualizarPago = async (req, res) => {
+exports.actualizarPago = async (req, res, next) => {
     const { id } = req.params;
     const { idpedido, idusuario, monto, fecha } = req.body;
     console.log(`[Pago] Actualizar | Pago ID: ${id}, Pedido: ${idpedido}, Usuario: ${idusuario}, Monto: ${monto}`);
@@ -105,7 +105,7 @@ exports.actualizarPago = async (req, res) => {
 };
 
 // Eliminar un pago
-exports.eliminarPago = async (req, res) => {
+exports.eliminarPago = async (req, res, next) => {
     const { id } = req.params;
     console.log(`🗑️ [Pago] Eliminar | Pago ID: ${id}`);
 

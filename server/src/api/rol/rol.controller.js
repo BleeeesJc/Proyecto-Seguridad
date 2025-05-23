@@ -4,7 +4,7 @@ const Logs = require("../logs/log.model");
 const axios = require("axios");
 
 // GET ALL ROLES
-exports.getAllRoles = async (req, res) => {
+exports.getAllRoles = async (req, res, next) => {
   const idUsuario = req.user.id;
   try {
     const roles = await Rol.findAll();
@@ -32,7 +32,7 @@ exports.getAllRoles = async (req, res) => {
 };
 
 // GET ROL BY ID
-exports.getRolById = async (req, res) => {
+exports.getRolById = async (req, res, next) => {
   const idUsuario = req.user.id;
   const { id } = req.params;
   try {
@@ -64,7 +64,7 @@ exports.getRolById = async (req, res) => {
 };
 
 // CREATE ROL
-exports.createRol = async (req, res) => {
+exports.createRol = async (req, res, next) => {
   const idUsuario = req.user.id;
   try {
     const {
@@ -104,7 +104,7 @@ exports.createRol = async (req, res) => {
 };
 
 // UPDATE ROL
-exports.updateRol = async (req, res) => {
+exports.updateRol = async (req, res, next) => {
   const idUsuario = req.user.id;
   const { id } = req.params;
   const {
@@ -159,7 +159,7 @@ exports.updateRol = async (req, res) => {
 };
 
 // DELETE ROL
-exports.deleteRol = async (req, res) => {
+exports.deleteRol = async (req, res, next) => {
   const idUsuario = req.user.id;
   const { id } = req.params;
 

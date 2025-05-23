@@ -1,7 +1,7 @@
 const sequelize = require('../../config/db');
 
 // Crear un nuevo detalle de pedido
-exports.crearDetallePedido = async (req, res) => {
+exports.crearDetallePedido = async (req, res, next) => {
     const { cantidad, idplato, idpedido, idreserva } = req.body;
     console.log(`[DetallePedido] Crear | Plato: ${idplato}, Pedido: ${idpedido}, Reserva: ${idreserva}, Cantidad: ${cantidad}`);
 
@@ -23,7 +23,7 @@ exports.crearDetallePedido = async (req, res) => {
 };
 
 // Obtener todos los detalles de pedido
-exports.obtenerDetallesPedido = async (req, res) => {
+exports.obtenerDetallesPedido = async (req, res, next) => {
     console.log(`📦 [DetallePedido] Obtener todos`);
 
     try {
@@ -44,7 +44,7 @@ exports.obtenerDetallesPedido = async (req, res) => {
 };
 
 // Actualizar un detalle de pedido
-exports.actualizarDetallePedido = async (req, res) => {
+exports.actualizarDetallePedido = async (req, res, next) => {
     const { id } = req.params;
     const { cantidad, idplato, idpedido, idreserva } = req.body;
     console.log(`🔧 [DetallePedido] Actualizar | ID: ${id}`);
@@ -73,7 +73,7 @@ exports.actualizarDetallePedido = async (req, res) => {
 };
 
 // Eliminar un detalle de pedido
-exports.eliminarDetallePedido = async (req, res) => {
+exports.eliminarDetallePedido = async (req, res, next) => {
     const { id } = req.params;
     console.log(`[DetallePedido] Eliminar | ID: ${id}`);
 
@@ -96,7 +96,7 @@ exports.eliminarDetallePedido = async (req, res) => {
 };
 
 // Obtener detalles por ID de pedido
-exports.obtenerDetallesPedidoPorPedido = async (req, res) => {
+exports.obtenerDetallesPedidoPorPedido = async (req, res, next) => {
     const { pedido } = req.query;
 
     if (!pedido) {

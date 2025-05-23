@@ -2,7 +2,7 @@
 const sequelize = require('../../config/db');
 
 // Crear una nueva categoría
-exports.crearCategoria = async (req, res) => {
+exports.crearCategoria = async (req, res, next) => {
     const { tipo, descripcion } = req.body;
     console.log(`Crear categoría | Tipo: ${tipo}, Descripción: ${descripcion}`);
 
@@ -23,7 +23,7 @@ exports.crearCategoria = async (req, res) => {
 };
 
 // Obtener todas las categorías
-exports.obtenerCategorias = async (req, res) => {
+exports.obtenerCategorias = async (req, res, next) => {
     console.log('Obtener todas las categorías');
 
     try {
@@ -40,7 +40,7 @@ exports.obtenerCategorias = async (req, res) => {
 };
 
 // Actualizar una categoría
-exports.actualizarCategoria = async (req, res) => {
+exports.actualizarCategoria = async (req, res, next) => {
     const { id } = req.params;
     const { tipo, descripcion } = req.body;
 
@@ -69,7 +69,7 @@ exports.actualizarCategoria = async (req, res) => {
 };
 
 // Eliminar una categoría
-exports.eliminarCategoria = async (req, res) => {
+exports.eliminarCategoria = async (req, res, next) => {
     const { id } = req.params;
     console.log(`📥 Eliminar categoría | ID: ${id}`);
 

@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-exports.crearReserva = async (req, res) => {
+exports.crearReserva = async (req, res, next) => {
     const { idusuario, idmesa, fecha, hora, estado } = req.body; // Extraer datos del body
     console.log(`[Reserva] Crear | Usuario: ${idusuario}, Mesa: ${idmesa}, Fecha: ${fecha} ${hora}, Estado: ${estado}`);
 
@@ -82,7 +82,7 @@ exports.crearReserva = async (req, res) => {
 };
 
 // Obtener todas las reservas
-exports.obtenerReservas = async (req, res) => {
+exports.obtenerReservas = async (req, res, next) => {
     console.log('[Reserva] Obtener todas');
     try {
         const reservas = await sequelize.query(
@@ -99,7 +99,7 @@ exports.obtenerReservas = async (req, res) => {
 };
 
 // Actualizar una reserva
-exports.actualizarReserva = async (req, res) => {
+exports.actualizarReserva = async (req, res, next) => {
     const { id } = req.params;
     const { fecha, hora, estado, idusuario, idmesa } = req.body;
 
@@ -132,7 +132,7 @@ exports.actualizarReserva = async (req, res) => {
 
 
 // Eliminar una reserva
-exports.eliminarReserva = async (req, res) => {
+exports.eliminarReserva = async (req, res, next) => {
     const { id } = req.params;
     console.log(`[Reserva] Eliminar | ID: ${id}`);
     try {
@@ -155,7 +155,7 @@ exports.eliminarReserva = async (req, res) => {
         next(error);
     }
 };
-exports.verificarDisponibilidad = async (req, res) => {
+exports.verificarDisponibilidad = async (req, res, next) => {
     const { idmesa, fecha, hora, idreserva } = req.query;
     console.log('[Reserva] Verificar disponibilidad:', { idmesa, fecha, hora, idreserva });
     if (!idmesa || !fecha || !hora) {
@@ -188,7 +188,7 @@ exports.verificarDisponibilidad = async (req, res) => {
 };
 
 // Controlador para verificar si el usuario está registrado
-exports.verificarUsuario = async (req, res) => {
+exports.verificarUsuario = async (req, res, next) => {
     const { idusuario } = req.query;
     console.log(`[Reserva] Verificar usuario registrado | ID: ${idusuario}`);
     try {
@@ -211,7 +211,7 @@ exports.verificarUsuario = async (req, res) => {
     }
 };
 
-exports.enviarRecordatorios = async () => {
+exports.enviarRecordatorios = async (next) => {
     console.log('[Reserva] Enviar recordatorios iniciando');
     try {
         const ahora = new Date();
@@ -265,7 +265,7 @@ exports.enviarRecordatorios = async () => {
 };
 
 
-exports.obtenerReservasPorUsuario = async (req, res) => {
+exports.obtenerReservasPorUsuario = async (req, res, next) => {
     const { idUsuario } = req.params;
     console.log(`[Reserva] Obtener por usuario | Usuario: ${idUsuario}`);
 

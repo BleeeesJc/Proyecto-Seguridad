@@ -1,7 +1,7 @@
 const sequelize = require('../../config/db');
 
 // Crear una nueva calificación
-exports.crearCalificacion = async (req, res) => {
+exports.crearCalificacion = async (req, res, next) => {
   const { puntuacion, idusuario, idplato } = req.body;
   console.log(`Crear calificación | Usuario: ${idusuario}, Plato: ${idplato}, Puntuación: ${puntuacion}`);
 
@@ -26,7 +26,7 @@ exports.crearCalificacion = async (req, res) => {
 };
 
 // Obtener todas las calificaciones
-exports.obtenerCalificaciones = async (req, res) => {
+exports.obtenerCalificaciones = async (req, res, next) => {
   console.log('Obtener todas las calificaciones');
 
   try {
@@ -47,7 +47,7 @@ exports.obtenerCalificaciones = async (req, res) => {
 };
 
 // Actualizar calificación
-exports.actualizarCalificacion = async (req, res) => {
+exports.actualizarCalificacion = async (req, res, next) => {
   const { puntuacion, idusuario, idplato } = req.body;
   console.log(`Actualizar calificación | Usuario: ${idusuario}, Plato: ${idplato}, Nueva puntuación: ${puntuacion}`);
 
@@ -75,7 +75,7 @@ exports.actualizarCalificacion = async (req, res) => {
 };
 
 // Eliminar calificación
-exports.eliminarCalificacion = async (req, res) => {
+exports.eliminarCalificacion = async (req, res, next) => {
   const { id } = req.params;
   console.log(`Eliminar calificación | ID: ${id}`);
 
@@ -101,7 +101,7 @@ exports.eliminarCalificacion = async (req, res) => {
 };
 
 // Verificar existencia de reseña
-exports.existeResenia = async (req, res) => {
+exports.existeResenia = async (req, res, next) => {
   const { idusuario, idplato } = req.query;
   console.log(`Verificar reseña | Usuario: ${idusuario}, Plato: ${idplato}`);
 
@@ -127,7 +127,7 @@ exports.existeResenia = async (req, res) => {
 };
 
 // Obtener calificaciones por usuario
-exports.obtenerCalificacionesPorUsuario = async (req, res) => {
+exports.obtenerCalificacionesPorUsuario = async (req, res, next) => {
   const { idusuario } = req.params;
   console.log(`Obtener calificaciones del usuario | ID: ${idusuario}`);
 
@@ -155,7 +155,7 @@ exports.obtenerCalificacionesPorUsuario = async (req, res) => {
 };
 
 
-exports.calificarExperiencia = async (req, res) => {
+exports.calificarExperiencia = async (req, res, next) => {
   const { puntuacion, idusuario, fecha } = req.body;
   console.log(`Calificar experiencia | Usuario: ${idusuario}, Fecha: ${fecha}, Puntuación: ${puntuacion}`);
 

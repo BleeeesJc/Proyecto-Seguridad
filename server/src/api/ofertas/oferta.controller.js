@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Crear una nueva oferta
-exports.crearOferta = async (req, res) => {
+exports.crearOferta = async (req, res, next) => {
     try {
         const { titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
         const src = req.file ? req.file.path : null; // Ruta relativa de la imagen
@@ -70,7 +70,7 @@ exports.crearOferta = async (req, res) => {
 };
 
 // Obtener todas las ofertas
-exports.obtenerOfertas = async (req, res) => {
+exports.obtenerOfertas = async (req, res, next) => {
     try {
         const ofertas = await sequelize.query(
             `SELECT * FROM oferta`,
@@ -84,7 +84,7 @@ exports.obtenerOfertas = async (req, res) => {
 };
 
 // Actualizar una oferta
-exports.actualizarOferta = async (req, res) => {
+exports.actualizarOferta = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { titulo, requerimiento, descripcion, fecha_inicio, fecha_fin, descuento, idPlato } = req.body;
@@ -174,7 +174,7 @@ exports.actualizarOferta = async (req, res) => {
 
 
 // Eliminar una oferta
-exports.eliminarOferta = async (req, res) => {
+exports.eliminarOferta = async (req, res, next) => {
     const { id } = req.params;
     console.log(`[Oferta] Eliminar | ID: ${id}`);
     try {
@@ -195,6 +195,6 @@ exports.eliminarOferta = async (req, res) => {
         }
     } catch (error) {
         console.error(`[Oferta] Error al eliminar la oferta | ${error.message}`);
-        res.status(500).json({ error: 'Error al eliminar la oferta' });
+        next(error);
     }
 };  

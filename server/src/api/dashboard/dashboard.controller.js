@@ -1,7 +1,7 @@
 const dashboardQueries = require('./dashboardQueries');
 
 const dashboardController = {
-    async obtenerTotalPedidos(req, res) {
+    async obtenerTotalPedidos(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener total de pedidos | Mes: ${month}`);
@@ -20,7 +20,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerIngresosTotales(req, res) {
+    async obtenerIngresosTotales(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener ingresos totales | Mes: ${month}`);
@@ -39,7 +39,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerCalificacionPromedio(req, res) {
+    async obtenerCalificacionPromedio(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener calificación promedio | Mes: ${month}`);
@@ -58,7 +58,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerIngresosPorDia(req, res) {
+    async obtenerIngresosPorDia(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener ingresos por día | Mes: ${month}`);
@@ -77,7 +77,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerIngresosPorMes(req, res) {
+    async obtenerIngresosPorMes(req, res, next) {
         console.log(`[Dashboard] Obtener ingresos por mes`);
 
         try {
@@ -89,7 +89,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerConsumoPorHoras(req, res) {
+    async obtenerConsumoPorHoras(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener consumo por horas | Mes: ${month}`);
@@ -108,7 +108,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerProductosMasVendidos(req, res) {
+    async obtenerProductosMasVendidos(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener productos más vendidos | Mes: ${month}`);
@@ -127,7 +127,7 @@ const dashboardController = {
         }
     },
 
-    async obtenerReseñasPorPlatos(req, res) {
+    async obtenerReseñasPorPlatos(req, res, next) {
         const { month } = req.query;
         const monthNumber = parseInt(month, 10);
         console.log(`[Dashboard] Obtener reseñas por platos | Mes: ${month}`);

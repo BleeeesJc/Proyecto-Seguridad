@@ -2,7 +2,7 @@
 const { Op } = require('sequelize');
 const Log = require('./log.model');
 
-exports.getAllLogs = async (req, res) => {
+exports.getAllLogs = async (req, res, next) => {
   try {
     const {
       page = 1,
@@ -17,10 +17,10 @@ exports.getAllLogs = async (req, res) => {
     } = req.query;
 
     const where = {};
-    if (accion)    where.accion    = { [Op.iLike]: `%${accion}%` };
-    if (medio)     where.medio     = { [Op.iLike]: `%${medio}%` };
-    if (origen)    where.origen    = { [Op.iLike]: `%${origen}%` };
-    if (codigo)    where.codigo    = codigo;
+    if (accion) where.accion = { [Op.iLike]: `%${accion}%` };
+    if (medio) where.medio = { [Op.iLike]: `%${medio}%` };
+    if (origen) where.origen = { [Op.iLike]: `%${origen}%` };
+    if (codigo) where.codigo = codigo;
     if (idusuario) where.idusuario = idusuario;
     if (fechaDesde || fechaHasta) {
       where.fecha = {};
@@ -40,11 +40,11 @@ exports.getAllLogs = async (req, res) => {
     res.json(logs);
   } catch (error) {
     console.error('Error al obtener logs:', error);
-    res.status(500).json({ message: 'Error al obtener los registros' });
+    next(error);
   }
 };
 
-exports.getLogById = async (req, res) => {
+exports.getLogById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const log = await Log.findByPk(id);
@@ -56,11 +56,11 @@ exports.getLogById = async (req, res) => {
     res.json(log);
   } catch (error) {
     console.error('Error al obtener log:', error);
-    res.status(500).json({ message: 'Error al obtener el registro' });
+    next(error);
   }
 };
 
-exports.createLog = async (req, res) => {
+exports.createLog = async (req, res, next) => {
   try {
     const { accion, medio, origen, idusuario, codigo } = req.body;
     if (!accion || !medio || !origen || !codigo) {
@@ -80,11 +80,11 @@ exports.createLog = async (req, res) => {
     res.status(201).json(newLog);
   } catch (error) {
     console.error('Error al crear log:', error);
-    res.status(500).json({ message: 'Error al crear el registro' });
+    next(error);
   }
 };
 
-exports.deleteLog = async (req, res) => {
+exports.deleteLog = async (req, res, next) => {
   try {
     const { id } = req.params;
     const deleted = await Log.destroy({ where: { idlog: id } });
@@ -96,11 +96,11 @@ exports.deleteLog = async (req, res) => {
     res.json({ message: 'Log eliminado correctamente' });
   } catch (error) {
     console.error('Error al eliminar log:', error);
-    res.status(500).json({ message: 'Error al eliminar el registro' });
+    next(error);
   }
 };
 
-exports.updateLog = async (req, res) => {
+exports.updateLog = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { accion, medio, origen, idusuario, codigo } = req.body;
@@ -118,6 +118,6 @@ exports.updateLog = async (req, res) => {
     res.json(updatedLog);
   } catch (error) {
     console.error('Error al actualizar log:', error);
-    res.status(500).json({ message: 'Error al actualizar el registro' });
+    next(error);
   }
 };

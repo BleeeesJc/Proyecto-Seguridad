@@ -1,7 +1,7 @@
 // src/api/pedidos/pedido.controller.js
 const sequelize = require('../../config/db');
 
-exports.crearPedido = async (req, res) => {
+exports.crearPedido = async (req, res, next) => {
   const { fecha, hora, estado, idusuario, precio_total, detalles } = req.body;
   console.log(`[Pedido] Crear | Usuario: ${idusuario}, Fecha: ${fecha} ${hora}, Total: ${precio_total}, Ítems: ${detalles?.length}`);
 
@@ -76,7 +76,7 @@ exports.crearPedido = async (req, res) => {
   }
 };
 
-exports.obtenerPedidos = async (req, res) => {
+exports.obtenerPedidos = async (req, res, next) => {
   console.log('[Pedido] Obtener todos');
   try {
     const pedidos = await sequelize.query(
@@ -92,7 +92,7 @@ exports.obtenerPedidos = async (req, res) => {
   }
 };
 
-exports.actualizarPedido = async (req, res) => {
+exports.actualizarPedido = async (req, res, next) => {
   const { id } = req.params;
   const { fecha, hora, estado, idusuario, precio_total } = req.body;
   console.log(`[Pedido] Actualizar | ID: ${id}`);
@@ -120,7 +120,7 @@ exports.actualizarPedido = async (req, res) => {
   }
 };
 
-exports.eliminarPedido = async (req, res) => {
+exports.eliminarPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Eliminar | ID: ${id}`);
 
@@ -143,7 +143,7 @@ exports.eliminarPedido = async (req, res) => {
 };
 
 // Cambia el estado de un pedido a entregado (1)
-exports.entregarPedido = async (req, res) => {
+exports.entregarPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Entregar | ID: ${id}`);
 
@@ -171,7 +171,7 @@ exports.entregarPedido = async (req, res) => {
 };
 
 // Cambia el estado de un pedido a cancelado (2)
-exports.cancelarPedido = async (req, res) => {
+exports.cancelarPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Cancelar | ID: ${id}`);
 
@@ -199,7 +199,7 @@ exports.cancelarPedido = async (req, res) => {
 };
 
 // Cambia el estado de un pedido a pagado (3)
-exports.registrarPagoPedido = async (req, res) => {
+exports.registrarPagoPedido = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Pedido] Registrar pago | ID: ${id}`);
 
@@ -226,7 +226,7 @@ exports.registrarPagoPedido = async (req, res) => {
   }
 };
 
-exports.obtenerPedidosPorUsuario = async (req, res) => {
+exports.obtenerPedidosPorUsuario = async (req, res, next) => {
   const { idUsuario } = req.params;
   console.log(`[Pedido] Obtener por usuario | Usuario: ${idUsuario}`);
 

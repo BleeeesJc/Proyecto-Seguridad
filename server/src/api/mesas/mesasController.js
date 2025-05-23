@@ -1,7 +1,7 @@
 const Mesa = require('./mesasModel');
 
 // Obtener todas las mesas visibles
-const obtenerMesa = async (req, res) => {
+const obtenerMesa = async (req, res, next) => {
   console.log('[Mesa] Obtener todas las mesas visibles');
 
   try {
@@ -14,7 +14,7 @@ const obtenerMesa = async (req, res) => {
 };
 
 // Obtener una mesa por ID
-const obtenerMesaPorId = async (req, res) => {
+const obtenerMesaPorId = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Mesa] Buscar por ID | ID: ${id}`);
 
@@ -34,7 +34,7 @@ const obtenerMesaPorId = async (req, res) => {
 };
 
 // Crear una nueva mesa
-const crearMesa = async (req, res) => {
+const crearMesa = async (req, res, next) => {
   const { nombre, capacidad, posx, posy } = req.body;
   console.log(`[Mesa] Crear | Nombre: ${nombre}, Capacidad: ${capacidad}, Posición: (${posx}, ${posy})`);
 
@@ -48,7 +48,7 @@ const crearMesa = async (req, res) => {
 };
 
 // Actualizar una mesa existente
-const actualizarMesa = async (req, res) => {
+const actualizarMesa = async (req, res, next) => {
   const { id } = req.params;
   const { capacidad, nombre, posx, posy } = req.body;
   console.log(`🔧 [Mesa] Actualizar | ID: ${id}`);
@@ -75,7 +75,7 @@ const actualizarMesa = async (req, res) => {
 };
 
 // Eliminar una mesa
-const borrarMesa = async (req, res) => {
+const borrarMesa = async (req, res, next) => {
   const { id } = req.params;
   console.log(`[Mesa] Eliminar | ID: ${id}`);
 
@@ -96,7 +96,7 @@ const borrarMesa = async (req, res) => {
 };
 
 // Cambiar estado visible de una mesa
-const actualizarEstadoMesa = async (req, res) => {
+const actualizarEstadoMesa = async (req, res, next) => {
   const { id } = req.params;
   const { visible } = req.body;
   console.log(`[Mesa] Cambiar visibilidad | ID: ${id} → Visible: ${visible}`);
