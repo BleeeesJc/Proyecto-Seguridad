@@ -1,18 +1,14 @@
 // server/src/config/db.js
 const { Sequelize } = require('sequelize');
+const config = require('./dotenv');
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize(config.dbName, config.dbUser, config.dbPassword, {
+  host: config.dbHost,
+  port: config.dbPort,
   dialect: 'postgres',
-  protocol: 'postgres',
   logging: false,
-  dialectOptions: {
-    ssl: { require: true, rejectUnauthorized: false }
-  }
 });
 
-sequelize
-  .authenticate()
-  .then(() => console.log('✅ DB conectada'))
-  .catch(err => console.error('❌ Error al conectar a la base de datos:', err));
+console.log("Base de datos conectada en el puerto: " + config.dbPort);
 
 module.exports = sequelize;
