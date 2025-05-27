@@ -14,7 +14,7 @@ app.use(express.json());
 // Seguridad CSP manual
 const cspHeaderValue = "default-src 'self' data:; " +
   "script-src 'self' https://www.google.com https://www.gstatic.com; " +
-  "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
   "img-src 'self' https://images.pexels.com https://cdn.hellofresh.com https://i.pinimg.com https://media.citybeat.com https://www.agoda.com https://images.unsplash.com https://mir-s3-cdn-cf.behance.net https://img.icons8.com https://www.gstatic.com https://www.google.com data:; " +
   "connect-src 'self' ws://172.18.4.101:8081 http://localhost:5000 data: https://www.google.com; " +
   "font-src 'self' https://fonts.gstatic.com data:; " +
